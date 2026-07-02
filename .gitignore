@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+release/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Generated icon intermediates (icon.icns is kept)
+resources/icon.iconset/
+
+# Electron builder cache
+*.blockmap

@@ -1,0 +1,21 @@
+appId: com.youtube-music.desktop
+productName: YouTube Music
+directories:
+  output: release
+files:
+  - out/**/*
+  - resources/**/*
+  - "!resources/icon.png"
+  - "!resources/icon.iconset/**"
+extraResources:
+  - from: resources/inject
+    to: inject
+mac:
+  target: dmg
+  icon: resources/icon.icns
+  category: public.app-category.music
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+dmg:
+  title: YouTube Music

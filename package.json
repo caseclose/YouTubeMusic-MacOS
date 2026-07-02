@@ -1,0 +1,55 @@
+{
+  "name": "youtube-music",
+  "version": "1.0.1",
+  "description": "Mac desktop app for YouTube Music with native integrations",
+  "main": "./out/main/index.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  },
+  "build": {
+    "appId": "com.youtube-music.desktop",
+    "productName": "YouTube Music",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "resources/**/*",
+      "!resources/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/inject",
+        "to": "inject"
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "resources/icon.icns",
+      "category": "public.app-category.music",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "YouTube Music"
+    }
+  }
+}
