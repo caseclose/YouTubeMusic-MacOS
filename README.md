@@ -1,6 +1,6 @@
 # YouTube Music for Mac
 
-**原生体验的 macOS 桌面客户端**
+<p align="center"><strong>原生体验的 macOS 桌面客户端</strong></p>
 
 <p align="center">完整网页功能 · 系统集成 · 开源自用</p>
 
