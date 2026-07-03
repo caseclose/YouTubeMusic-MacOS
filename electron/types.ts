@@ -1,4 +1,4 @@
-export type PlayerControlAction = 'playPause' | 'next' | 'previous' | 'seek'
+export type PlayerControlAction = 'playPause' | 'next' | 'previous' | 'seek' | 'setVolume' | 'like' | 'dislike'
 export type NavigationCommand = 'back' | 'forward' | 'reload'
 
 export interface NavigationState {
@@ -18,6 +18,11 @@ export interface PlayerState {
   isPlaying: boolean
   duration: number
   position: number
+  volume: number
+  liked: boolean
+  disliked: boolean
+  canLike: boolean
+  canDislike: boolean
 }
 
 export interface ShortcutConfig {

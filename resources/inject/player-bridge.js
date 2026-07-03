@@ -46,6 +46,41 @@
     return img?.src || img?.getAttribute('src') || ''
   }
 
+  function queryFeedbackButton(kind) {
+    const selectors =
+      kind === 'like'
+        ? [
+            'ytmusic-player-bar button[aria-label*="Like"]',
+            'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="Like"]',
+            'ytmusic-player-bar button[aria-label*="赞"]',
+            'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="赞"]'
+          ]
+        : [
+            'ytmusic-player-bar button[aria-label*="Dislike"]',
+            'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="Dislike"]',
+            'ytmusic-player-bar button[aria-label*="不喜欢"]',
+            'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="不喜欢"]',
+            'ytmusic-player-bar button[aria-label*="踩"]',
+            'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="踩"]'
+          ]
+
+    return queryButton(selectors)
+  }
+
+  function isFeedbackActive(kind) {
+    const button = queryFeedbackButton(kind)
+    if (!button) return false
+
+    const pressed = button.getAttribute('aria-pressed')
+    if (pressed) return pressed === 'true'
+
+    const label = (button.getAttribute('aria-label') || '').toLowerCase()
+    if (kind === 'like') {
+      return label.includes('liked') || label.includes('已赞') || label.includes('取消赞')
+    }
+    return label.includes('disliked') || label.includes('已踩') || label.includes('取消不喜欢')
+  }
+
   function getPlayerState() {
     const video = getVideo()
     return {
@@ -55,7 +90,12 @@
       thumbnail: getThumbnail(),
       isPlaying: video ? !video.paused && !video.ended : false,
       duration: video?.duration && isFinite(video.duration) ? video.duration : 0,
-      position: video?.currentTime && isFinite(video.currentTime) ? video.currentTime : 0
+      position: video?.currentTime && isFinite(video.currentTime) ? video.currentTime : 0,
+      volume: video ? video.volume : 1,
+      liked: isFeedbackActive('like'),
+      disliked: isFeedbackActive('dislike'),
+      canLike: Boolean(queryFeedbackButton('like')),
+      canDislike: Boolean(queryFeedbackButton('dislike'))
     }
   }
 
@@ -96,6 +136,18 @@
         if (video && typeof seekTo === 'number') {
           video.currentTime = seekTo / 1000
         }
+        break
+      case 'setVolume':
+        if (video && typeof seekTo === 'number') {
+          video.volume = Math.min(1, Math.max(0, seekTo))
+          video.muted = video.volume === 0
+          sendState()
+        }
+        break
+      case 'like':
+      case 'dislike':
+        queryFeedbackButton(action)?.click()
+        setTimeout(sendState, 150)
         break
     }
   }

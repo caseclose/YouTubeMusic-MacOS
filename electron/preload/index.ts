@@ -46,5 +46,18 @@ contextBridge.exposeInMainWorld('ytmBridge', {
   },
   toggleMiniPlayerAlwaysOnTop: () => {
     return ipcRenderer.invoke('mini-player:toggle-always-on-top') as Promise<MiniPlayerWindowState>
+  },
+  getMiniPlayerState: () => {
+    return ipcRenderer.invoke('mini-player:state') as Promise<PlayerState | null>
+  },
+  sendMiniPlayerControl: (action: PlayerControlAction, value?: number) => {
+    ipcRenderer.send('mini-player:control', action, value)
+  },
+  onMiniPlayerState: (callback: (state: PlayerState | null) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, state: PlayerState | null) => {
+      callback(state)
+    }
+    ipcRenderer.on('mini-player:state', handler)
+    return () => ipcRenderer.removeListener('mini-player:state', handler)
   }
 })

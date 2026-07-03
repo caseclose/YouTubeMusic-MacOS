@@ -10,13 +10,14 @@ import {
   type PlayerState
 } from '../types'
 import { applyWebContentsSpoofing, CHROME_UA, loadUrl } from './browser-spoof'
-import { registerPlayerWindow } from './player-control'
+import { registerPlayerWindow, sendPlayerControl } from './player-control'
 import { setupNavigationGuards, setupWindowOpenHandler } from './session'
 import { getIsQuitting } from './app-state'
 
 let mainWindow: BrowserWindow | null = null
 let miniPlayerWindow: BrowserWindow | null = null
 let miniPlayerAlwaysOnTop = true
+let lastPlayerState: PlayerState | null = null
 
 const MAIN_WINDOW_DRAG_CSS = `
   ytmusic-nav-bar {
@@ -706,8 +707,14 @@ function createBaseWebPreferences() {
     contextIsolation: true,
     nodeIntegration: false,
     sandbox: false,
-    webSecurity: true
+    webSecurity: true,
+    backgroundThrottling: false
   }
+}
+
+function getMiniPlayerHtmlUrl(): string {
+  const html = '<!doctype html><html><head><meta charset="utf-8"><title>Mini Player</title></head><body></body></html>'
+  return `data:text/html;charset=utf-8,${encodeURIComponent(html)}`
 }
 
 function getNavigationState(win: BrowserWindow | null): NavigationState {
@@ -728,6 +735,11 @@ function sendNavigationState(win: BrowserWindow): void {
 
 function getMiniPlayerWindowState(): MiniPlayerWindowState {
   return { alwaysOnTop: miniPlayerAlwaysOnTop }
+}
+
+function sendMiniPlayerState(): void {
+  if (!miniPlayerWindow || miniPlayerWindow.isDestroyed()) return
+  miniPlayerWindow.webContents.send('mini-player:state', lastPlayerState)
 }
 
 function setupMiniPlayerWindowControls(): void {
@@ -751,6 +763,14 @@ function setupMiniPlayerWindowControls(): void {
     miniPlayerAlwaysOnTop = !miniPlayerAlwaysOnTop
     sourceWindow.setAlwaysOnTop(miniPlayerAlwaysOnTop)
     return getMiniPlayerWindowState()
+  })
+
+  ipcMain.handle('mini-player:state', () => {
+    return lastPlayerState
+  })
+
+  ipcMain.on('mini-player:control', (_event, action, value?: number) => {
+    sendPlayerControl(action, value)
   })
 }
 
@@ -923,6 +943,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           url: '',
           lastDeepScanAt: 0
         };
+        let miniPlayerState = null;
 
         function ensureMiniPlayer() {
           let root = document.getElementById('ytm-electron-mini-player');
@@ -987,19 +1008,21 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
           const seek = root.querySelector('.mini-progress input');
           seek.addEventListener('input', () => {
-            const video = getVideo();
-            if (!video || !video.duration || !Number.isFinite(video.duration)) return;
+            const state = getState();
+            if (!state.duration || !Number.isFinite(state.duration)) return;
             const ratio = Math.min(1, Math.max(0, Number(seek.value) / 1000));
-            video.currentTime = ratio * video.duration;
+            window.ytmBridge?.sendMiniPlayerControl?.('seek', ratio * state.duration * 1000);
+            miniPlayerState = { ...state, position: ratio * state.duration };
             updateMiniPlayer();
           });
 
           const volume = root.querySelector('.mini-volume input');
           volume.addEventListener('input', () => {
-            const video = getVideo();
-            if (!video) return;
-            video.volume = Math.min(1, Math.max(0, Number(volume.value) / 100));
-            video.muted = video.volume === 0;
+            const nextVolume = Math.min(1, Math.max(0, Number(volume.value) / 100));
+            window.ytmBridge?.sendMiniPlayerControl?.('setVolume', nextVolume);
+            if (miniPlayerState) {
+              miniPlayerState = { ...miniPlayerState, volume: nextVolume };
+            }
           });
 
           document.body.appendChild(root);
@@ -1226,68 +1249,28 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         function getState() {
-          const video = getVideo();
-          const title = getTitle();
-          const artist = getArtist();
-          const trackKey = \`\${title}\\n\${artist}\`;
-          const likeButton = getFeedbackButton('like');
-          const dislikeButton = getFeedbackButton('dislike');
-
           return {
-            title,
-            artist,
-            thumbnail: getThumbnail(trackKey),
-            isPlaying: video ? !video.paused && !video.ended : false,
-            duration: video?.duration && Number.isFinite(video.duration) ? video.duration : 0,
-            position: video?.currentTime && Number.isFinite(video.currentTime) ? video.currentTime : 0,
-            volume: video ? video.volume : 1,
-            canLike: Boolean(likeButton),
-            canDislike: Boolean(dislikeButton),
-            liked: isFeedbackActive('like'),
-            disliked: isFeedbackActive('dislike')
+            title: miniPlayerState?.title || '',
+            artist: miniPlayerState?.artist || '',
+            thumbnail: miniPlayerState?.thumbnail || '',
+            isPlaying: Boolean(miniPlayerState?.isPlaying),
+            duration: miniPlayerState?.duration || 0,
+            position: miniPlayerState?.position || 0,
+            volume: typeof miniPlayerState?.volume === 'number' ? miniPlayerState.volume : 1,
+            canLike: Boolean(miniPlayerState?.canLike),
+            canDislike: Boolean(miniPlayerState?.canDislike),
+            liked: Boolean(miniPlayerState?.liked),
+            disliked: Boolean(miniPlayerState?.disliked)
           };
         }
 
         function handleControl(action) {
-          const video = getVideo();
-
-          if (action === 'playPause') {
-            if (video) {
-              if (video.paused) video.play().catch(() => {});
-              else video.pause();
-            } else {
-              clickButton([
-                'button[aria-label*="Pause"]',
-                'button[aria-label*="Play"]',
-                'tp-yt-paper-icon-button.play-pause-button',
-                '#play-pause-button'
-              ]);
-            }
-            return;
+          window.ytmBridge?.sendMiniPlayerControl?.(action);
+          if (action === 'playPause' && miniPlayerState) {
+            miniPlayerState = { ...miniPlayerState, isPlaying: !miniPlayerState.isPlaying };
+            updateMiniPlayer();
           }
-
-          if (action === 'next') {
-            clickButton([
-              'button[aria-label*="Next"]',
-              'button[aria-label*="next"]',
-              '.next-button',
-              'tp-yt-paper-icon-button.next'
-            ]);
-            return;
-          }
-
-          if (action === 'previous') {
-            clickButton([
-              'button[aria-label*="Previous"]',
-              'button[aria-label*="previous"]',
-              '.previous-button',
-              'tp-yt-paper-icon-button.previous'
-            ]);
-            return;
-          }
-
-          if (action === 'like' || action === 'dislike') {
-            getFeedbackButton(action)?.click();
+          if ((action === 'like' || action === 'dislike') && miniPlayerState) {
             setTimeout(updateMiniPlayer, 120);
           }
         }
@@ -1335,9 +1318,25 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           root.querySelector('[data-action="dislike"]').disabled = !state.canDislike;
         }
 
+        function subscribePlayerState() {
+          if (!window.ytmBridge || window.__ytmMiniPlayerStateListenerInstalled) return;
+          window.__ytmMiniPlayerStateListenerInstalled = true;
+
+          window.ytmBridge.onMiniPlayerState?.((state) => {
+            miniPlayerState = state;
+            updateMiniPlayer();
+          });
+
+          window.ytmBridge.getMiniPlayerState?.().then((state) => {
+            miniPlayerState = state;
+            updateMiniPlayer();
+          }).catch(() => {});
+        }
+
         ensureMiniPlayer();
         applyTheme();
         refreshPinState();
+        subscribePlayerState();
         updateMiniPlayer();
 
         if (!window.__ytmMiniPlayerInterval) {
@@ -1357,13 +1356,15 @@ function setupPlayerBridgeInjection(win: BrowserWindow, mode: 'main' | 'mini'): 
 
   const reinject = async () => {
     const url = win.webContents.getURL()
-    if (!url.includes('music.youtube.com')) return
+    if (mode === 'main' && !url.includes('music.youtube.com')) return
 
     if (url !== lastInjectedUrl) {
       lastInjectedUrl = url
     }
 
-    await injectPlayerBridge(win, mode)
+    if (mode === 'main') {
+      await injectPlayerBridge(win, mode)
+    }
     if (mode === 'main') {
       await injectMainWindowDragRegion(win)
     }
@@ -1376,10 +1377,12 @@ function setupPlayerBridgeInjection(win: BrowserWindow, mode: 'main' | 'mini'): 
   win.webContents.on('did-navigate-in-page', reinject)
 }
 
-export function createMainWindow(): BrowserWindow {
+export function createMainWindow(showOnReady = true): BrowserWindow {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.show()
-    mainWindow.focus()
+    if (showOnReady) {
+      mainWindow.show()
+      mainWindow.focus()
+    }
     return mainWindow
   }
 
@@ -1404,8 +1407,10 @@ export function createMainWindow(): BrowserWindow {
   registerPlayerWindow(mainWindow)
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow?.show()
-    mainWindow?.focus()
+    if (showOnReady) {
+      mainWindow?.show()
+      mainWindow?.focus()
+    }
   })
 
   mainWindow.on('close', (event) => {
@@ -1446,11 +1451,8 @@ export function createMiniPlayerWindow(): BrowserWindow {
     webPreferences: createBaseWebPreferences()
   })
 
-  miniPlayerWindow.webContents.setUserAgent(CHROME_UA)
-  applyWebContentsSpoofing(miniPlayerWindow.webContents)
   setupMiniPlayerWindowControls()
   setupPlayerBridgeInjection(miniPlayerWindow, 'mini')
-  registerPlayerWindow(miniPlayerWindow)
 
   miniPlayerWindow.once('ready-to-show', () => {
     miniPlayerWindow?.show()
@@ -1460,7 +1462,7 @@ export function createMiniPlayerWindow(): BrowserWindow {
     miniPlayerWindow = null
   })
 
-  loadUrl(miniPlayerWindow.webContents, YTM_URL)
+  miniPlayerWindow.loadURL(getMiniPlayerHtmlUrl())
 
   return miniPlayerWindow
 }
@@ -1474,6 +1476,9 @@ export function toggleMainWindow(): void {
   if (mainWindow.isVisible()) {
     mainWindow.hide()
   } else {
+    if (miniPlayerWindow && !miniPlayerWindow.isDestroyed()) {
+      miniPlayerWindow.hide()
+    }
     mainWindow.show()
     mainWindow.focus()
   }
@@ -1485,10 +1490,17 @@ export function toggleMiniPlayer(): void {
     return
   }
 
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    createMainWindow(false)
+  }
+  mainWindow?.hide()
   createMiniPlayerWindow()
 }
 
 export function showMainWindow(): void {
+  if (miniPlayerWindow && !miniPlayerWindow.isDestroyed()) {
+    miniPlayerWindow.hide()
+  }
   if (!mainWindow || mainWindow.isDestroyed()) {
     createMainWindow()
     return
@@ -1509,6 +1521,8 @@ export function setupPlayerStateIpc(
   onStateChange: (state: PlayerState) => void
 ): void {
   ipcMain.on('player:state', (_event, state: PlayerState) => {
+    lastPlayerState = state
+    sendMiniPlayerState()
     onStateChange(state)
   })
 }
