@@ -239,6 +239,108 @@ const MINI_PLAYER_CSS = `
     --mini-volume-track: rgba(187, 247, 208, 0.18);
   }
 
+  #ytm-electron-mini-player.theme-neon {
+    --mini-accent: #67e8f9;
+    --mini-accent-contrast: #031317;
+    --mini-bg:
+      radial-gradient(circle at 24% -10%, rgba(236, 72, 153, 0.34), transparent 30%),
+      radial-gradient(circle at 78% 4%, rgba(34, 211, 238, 0.32), transparent 34%),
+      linear-gradient(155deg, #18081f 0%, #07081a 52%, #02060a 100%);
+    --mini-card:
+      linear-gradient(145deg, rgba(34, 211, 238, 0.22), rgba(236, 72, 153, 0.12)),
+      rgba(10, 10, 25, 0.54);
+    --mini-button-bg: rgba(103, 232, 249, 0.08);
+    --mini-button-hover: rgba(236, 72, 153, 0.18);
+    --mini-button-active: rgba(103, 232, 249, 0.22);
+    --mini-track: rgba(103, 232, 249, 0.22);
+    --mini-volume-track: rgba(236, 72, 153, 0.16);
+  }
+
+  #ytm-electron-mini-player.theme-aurora {
+    --mini-accent: #c4b5fd;
+    --mini-accent-contrast: #12091f;
+    --mini-bg:
+      radial-gradient(circle at 18% 2%, rgba(45, 212, 191, 0.24), transparent 30%),
+      radial-gradient(circle at 82% -10%, rgba(196, 181, 253, 0.36), transparent 34%),
+      linear-gradient(180deg, #111827 0%, #0a1020 54%, #05070d 100%);
+    --mini-card:
+      linear-gradient(135deg, rgba(45, 212, 191, 0.14), rgba(196, 181, 253, 0.16)),
+      rgba(15, 23, 42, 0.5);
+    --mini-button-bg: rgba(196, 181, 253, 0.08);
+    --mini-button-hover: rgba(45, 212, 191, 0.15);
+    --mini-button-active: rgba(196, 181, 253, 0.23);
+    --mini-track: rgba(196, 181, 253, 0.22);
+    --mini-volume-track: rgba(45, 212, 191, 0.16);
+  }
+
+  #ytm-electron-mini-player.theme-sakura {
+    --mini-accent: #fecdd3;
+    --mini-accent-contrast: #21060d;
+    --mini-bg:
+      radial-gradient(circle at 50% -12%, rgba(251, 113, 133, 0.32), transparent 30%),
+      radial-gradient(circle at 6% 22%, rgba(244, 114, 182, 0.14), transparent 28%),
+      linear-gradient(180deg, #29151c 0%, #150b10 60%, #0b0608 100%);
+    --mini-card:
+      linear-gradient(150deg, rgba(251, 207, 232, 0.18), rgba(251, 113, 133, 0.08)),
+      rgba(45, 18, 28, 0.52);
+    --mini-button-bg: rgba(254, 205, 211, 0.08);
+    --mini-button-hover: rgba(251, 113, 133, 0.16);
+    --mini-button-active: rgba(254, 205, 211, 0.22);
+    --mini-track: rgba(254, 205, 211, 0.22);
+    --mini-volume-track: rgba(251, 113, 133, 0.16);
+  }
+
+  #ytm-electron-mini-player.theme-grape {
+    --mini-accent: #ddd6fe;
+    --mini-accent-contrast: #16051f;
+    --mini-bg:
+      radial-gradient(circle at 50% -16%, rgba(168, 85, 247, 0.38), transparent 30%),
+      radial-gradient(circle at 12% 14%, rgba(99, 102, 241, 0.16), transparent 30%),
+      linear-gradient(180deg, #211333 0%, #12091f 58%, #08040d 100%);
+    --mini-card:
+      linear-gradient(160deg, rgba(221, 214, 254, 0.18), rgba(168, 85, 247, 0.1)),
+      rgba(32, 15, 52, 0.54);
+    --mini-button-bg: rgba(221, 214, 254, 0.08);
+    --mini-button-hover: rgba(168, 85, 247, 0.17);
+    --mini-button-active: rgba(221, 214, 254, 0.22);
+    --mini-track: rgba(221, 214, 254, 0.22);
+    --mini-volume-track: rgba(168, 85, 247, 0.16);
+  }
+
+  #ytm-electron-mini-player.theme-latte {
+    --mini-accent: #f5e6c8;
+    --mini-accent-contrast: #24170b;
+    --mini-bg:
+      radial-gradient(circle at 50% -14%, rgba(245, 230, 200, 0.34), transparent 30%),
+      radial-gradient(circle at 8% 12%, rgba(180, 120, 68, 0.15), transparent 28%),
+      linear-gradient(180deg, #2d2118 0%, #17100c 60%, #0d0907 100%);
+    --mini-card:
+      linear-gradient(150deg, rgba(245, 230, 200, 0.18), rgba(180, 120, 68, 0.08)),
+      rgba(48, 33, 22, 0.54);
+    --mini-button-bg: rgba(245, 230, 200, 0.08);
+    --mini-button-hover: rgba(245, 230, 200, 0.15);
+    --mini-button-active: rgba(245, 230, 200, 0.22);
+    --mini-track: rgba(245, 230, 200, 0.22);
+    --mini-volume-track: rgba(245, 230, 200, 0.16);
+  }
+
+  #ytm-electron-mini-player.theme-ice {
+    --mini-accent: #e0f2fe;
+    --mini-accent-contrast: #07151f;
+    --mini-bg:
+      radial-gradient(circle at 50% -16%, rgba(224, 242, 254, 0.38), transparent 30%),
+      radial-gradient(circle at 16% 16%, rgba(125, 211, 252, 0.16), transparent 28%),
+      linear-gradient(180deg, #1b2630 0%, #0c131a 60%, #06090d 100%);
+    --mini-card:
+      linear-gradient(150deg, rgba(224, 242, 254, 0.2), rgba(125, 211, 252, 0.08)),
+      rgba(18, 31, 42, 0.55);
+    --mini-button-bg: rgba(224, 242, 254, 0.08);
+    --mini-button-hover: rgba(125, 211, 252, 0.16);
+    --mini-button-active: rgba(224, 242, 254, 0.22);
+    --mini-track: rgba(224, 242, 254, 0.22);
+    --mini-volume-track: rgba(125, 211, 252, 0.16);
+  }
+
   #ytm-electron-mini-player * {
     box-sizing: border-box !important;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif !important;
@@ -274,12 +376,22 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player .mini-theme {
     left: 14px !important;
+    opacity: 0.42 !important;
+  }
+
+  #ytm-electron-mini-player .mini-theme.is-hidden {
+    opacity: 0.08 !important;
+    transform: scale(0.72) !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   #ytm-electron-mini-player .mini-pin:hover,
   #ytm-electron-mini-player .mini-theme:hover {
     color: rgba(255, 255, 255, 0.9) !important;
     background: rgba(255, 255, 255, 0.13) !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   #ytm-electron-mini-player .mini-pin.is-active,
@@ -790,13 +902,20 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-tiny-themed-mini';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-fancy-themes';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
+        const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
           { id: 'classic', label: '黑曜' },
           { id: 'midnight', label: '午夜蓝' },
           { id: 'sunset', label: '暖橙' },
-          { id: 'forest', label: '森林绿' }
+          { id: 'forest', label: '森林绿' },
+          { id: 'neon', label: '霓虹' },
+          { id: 'aurora', label: '极光' },
+          { id: 'sakura', label: '樱花' },
+          { id: 'grape', label: '葡萄紫' },
+          { id: 'latte', label: '拿铁' },
+          { id: 'ice', label: '冰川' }
         ];
         const thumbnailCache = {
           key: '',
@@ -859,6 +978,11 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             applyTheme(next);
           });
 
+          root.querySelector('.mini-theme').addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            toggleThemeButtonHidden();
+          });
+
           const seek = root.querySelector('.mini-progress input');
           seek.addEventListener('input', () => {
             const video = getVideo();
@@ -899,12 +1023,36 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
           const button = root.querySelector('.mini-theme');
           button.classList.toggle('is-active', selected.id !== 'classic');
-          button.setAttribute('title', '主题：' + selected.label);
-          button.setAttribute('aria-label', '切换主题，当前：' + selected.label);
+          updateThemeButtonLabel(selected);
 
           try {
             localStorage.setItem(THEME_STORAGE_KEY, selected.id);
           } catch {}
+        }
+
+        function isThemeButtonHidden() {
+          try {
+            return localStorage.getItem(THEME_BUTTON_HIDDEN_KEY) === '1';
+          } catch {
+            return false;
+          }
+        }
+
+        function updateThemeButtonLabel(theme = themes.find((item) => item.id === getCurrentThemeId()) || themes[0]) {
+          const root = ensureMiniPlayer();
+          const button = root.querySelector('.mini-theme');
+          const hidden = isThemeButtonHidden();
+          button.classList.toggle('is-hidden', hidden);
+          button.setAttribute('title', '主题：' + theme.label + '；点击切换，右键' + (hidden ? '显示' : '隐藏') + '按钮');
+          button.setAttribute('aria-label', '切换主题，当前：' + theme.label);
+        }
+
+        function toggleThemeButtonHidden() {
+          const hidden = !isThemeButtonHidden();
+          try {
+            localStorage.setItem(THEME_BUTTON_HIDDEN_KEY, hidden ? '1' : '0');
+          } catch {}
+          updateThemeButtonLabel();
         }
 
         function updatePinState(state) {
