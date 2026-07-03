@@ -384,8 +384,7 @@ const MINI_PLAYER_CSS = `
     transform: scale(0.72) !important;
     background: transparent !important;
     box-shadow: none !important;
-    pointer-events: none !important;
-    -webkit-app-region: drag !important;
+    color: rgba(255, 255, 255, 0.26) !important;
   }
 
   #ytm-electron-mini-player .mini-pin:hover,
@@ -974,6 +973,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           });
 
           root.querySelector('.mini-theme').addEventListener('click', () => {
+            if (isThemeButtonHidden()) return;
             const current = getCurrentThemeId();
             const index = themes.findIndex((theme) => theme.id === current);
             const next = themes[(index + 1) % themes.length].id;
@@ -1050,7 +1050,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           const button = root.querySelector('.mini-theme');
           const hidden = isThemeButtonHidden();
           button.classList.toggle('is-hidden', hidden);
-          button.setAttribute('title', '主题：' + theme.label + '；点击切换，右键' + (hidden ? '显示' : '隐藏') + '按钮');
+          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '右键显示主题按钮' : '点击切换，右键隐藏按钮'));
           button.setAttribute('aria-label', '切换主题，当前：' + theme.label);
         }
 
