@@ -962,7 +962,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-dot-hide';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-hide-pointer';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
@@ -1032,7 +1032,13 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             updatePinState(state);
           });
 
-          root.querySelector('.mini-theme').addEventListener('click', () => {
+          const themeButton = root.querySelector('.mini-theme');
+          themeButton.addEventListener('click', (event) => {
+            if (event.altKey) {
+              event.preventDefault();
+              toggleThemeButtonHidden();
+              return;
+            }
             if (isThemeButtonHidden()) {
               setThemeButtonHidden(false);
               return;
@@ -1043,8 +1049,16 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             applyTheme(next);
           });
 
-          root.querySelector('.mini-theme').addEventListener('contextmenu', (event) => {
+          themeButton.addEventListener('pointerdown', (event) => {
+            if (event.button !== 2) return;
             event.preventDefault();
+            event.stopPropagation();
+            toggleThemeButtonHidden();
+          });
+
+          themeButton.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
             toggleThemeButtonHidden();
           });
 
@@ -1115,7 +1129,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           const button = root.querySelector('.mini-theme');
           const hidden = isThemeButtonHidden();
           button.classList.toggle('is-hidden', hidden);
-          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '点击或右键显示主题按钮' : '点击切换，右键隐藏为小圆点'));
+          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '点击或右键显示主题按钮' : '点击切换，右键或 Option+点击隐藏为小圆点'));
           button.setAttribute('aria-label', (hidden ? '显示主题按钮' : '切换主题') + '，当前：' + theme.label);
         }
 
