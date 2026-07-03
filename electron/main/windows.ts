@@ -742,6 +742,13 @@ function sendMiniPlayerState(): void {
   miniPlayerWindow.webContents.send('mini-player:state', lastPlayerState)
 }
 
+function hideMiniPlayerWindow(): void {
+  if (!miniPlayerWindow || miniPlayerWindow.isDestroyed()) return
+  miniPlayerWindow.setAlwaysOnTop(false)
+  miniPlayerWindow.hide()
+  miniPlayerWindow.setAlwaysOnTop(miniPlayerAlwaysOnTop)
+}
+
 function setupMiniPlayerWindowControls(): void {
   if (miniPlayerWindowIpcRegistered) return
   miniPlayerWindowIpcRegistered = true
@@ -1476,9 +1483,7 @@ export function toggleMainWindow(): void {
   if (mainWindow.isVisible()) {
     mainWindow.hide()
   } else {
-    if (miniPlayerWindow && !miniPlayerWindow.isDestroyed()) {
-      miniPlayerWindow.hide()
-    }
+    hideMiniPlayerWindow()
     mainWindow.show()
     mainWindow.focus()
   }
@@ -1498,9 +1503,7 @@ export function toggleMiniPlayer(): void {
 }
 
 export function showMainWindow(): void {
-  if (miniPlayerWindow && !miniPlayerWindow.isDestroyed()) {
-    miniPlayerWindow.hide()
-  }
+  hideMiniPlayerWindow()
   if (!mainWindow || mainWindow.isDestroyed()) {
     createMainWindow()
     return

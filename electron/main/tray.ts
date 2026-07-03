@@ -1,7 +1,7 @@
 import { app, Menu, Tray, nativeImage } from 'electron'
 import { join } from 'path'
 import { setIsQuitting } from './app-state'
-import { broadcastPlayerControl } from './player-control'
+import { sendPlayerControl } from './player-control'
 import {
   showMainWindow,
   toggleMainWindow,
@@ -43,15 +43,15 @@ function buildContextMenu(): Menu {
   return Menu.buildFromTemplate([
     {
       label: `${playingLabel}  ${state?.title ? `— ${state.title}` : ''}`,
-      click: () => broadcastPlayerControl('playPause')
+      click: () => sendPlayerControl('playPause')
     },
     {
       label: 'Previous',
-      click: () => broadcastPlayerControl('previous')
+      click: () => sendPlayerControl('previous')
     },
     {
       label: 'Next',
-      click: () => broadcastPlayerControl('next')
+      click: () => sendPlayerControl('next')
     },
     { type: 'separator' },
     {
