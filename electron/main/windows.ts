@@ -118,37 +118,158 @@ const MAIN_WINDOW_DRAG_CSS = `
 let navigationIpcRegistered = false
 
 const MINI_PLAYER_CSS = `
+  html,
+  body {
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    background: #0f0f0f !important;
+  }
+
   #guide-wrapper,
   #guide-content,
   ytmusic-nav-bar,
-  #content-wrapper > :not(ytmusic-player-bar):not(#player-page),
+  #content-wrapper > :not(ytmusic-player-bar),
   #masthead,
   .search-box,
   iron-pages > :not([selected]),
+  #player-page,
   ytmusic-browse-response,
   ytmusic-home-page,
   ytmusic-search-page,
   tp-yt-app-drawer {
     display: none !important;
   }
-  body {
+
+  ytmusic-app,
+  ytmusic-app-layout,
+  #content,
+  #content-wrapper {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 0 !important;
     overflow: hidden !important;
     background: #0f0f0f !important;
   }
+
   ytmusic-app-layout {
     min-height: 100vh !important;
   }
-  #player-page,
+
   ytmusic-player-bar {
     display: block !important;
   }
+
   ytmusic-player-bar {
     position: fixed !important;
-    bottom: 0 !important;
+    top: 28px !important;
     left: 0 !important;
     right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 28px) !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    background: linear-gradient(180deg, #181818 0%, #111 100%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
     z-index: 9999 !important;
   }
+
+  ytmusic-player-bar *,
+  ytmusic-player-bar ::before,
+  ytmusic-player-bar ::after {
+    box-sizing: border-box !important;
+  }
+
+  ytmusic-player-bar #progress-bar,
+  ytmusic-player-bar .progress-bar,
+  ytmusic-player-bar tp-yt-paper-progress,
+  ytmusic-player-bar ytmusic-player-bar-progress {
+    position: absolute !important;
+    top: 0 !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    z-index: 2 !important;
+  }
+
+  ytmusic-player-bar #main-panel,
+  ytmusic-player-bar .main-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  ytmusic-player-bar .content-info-wrapper,
+  ytmusic-player-bar .song-info,
+  ytmusic-player-bar #song-info {
+    position: absolute !important;
+    left: 24px !important;
+    right: 24px !important;
+    bottom: 86px !important;
+    max-width: calc(100vw - 48px) !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  ytmusic-player-bar .title,
+  ytmusic-player-bar .subtitle,
+  ytmusic-player-bar .byline,
+  ytmusic-player-bar yt-formatted-string {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  ytmusic-player-bar .title {
+    font-size: 22px !important;
+    line-height: 1.25 !important;
+    color: #fff !important;
+  }
+
+  ytmusic-player-bar .byline,
+  ytmusic-player-bar .subtitle {
+    font-size: 13px !important;
+    color: rgba(255, 255, 255, 0.68) !important;
+  }
+
+  ytmusic-player-bar img,
+  ytmusic-player-bar #song-image img,
+  ytmusic-player-bar .thumbnail-image-wrapper img {
+    width: 76px !important;
+    height: 76px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+  }
+
+  ytmusic-player-bar #left-controls,
+  ytmusic-player-bar .left-controls,
+  ytmusic-player-bar #center-controls,
+  ytmusic-player-bar .center-controls,
+  ytmusic-player-bar .middle-controls {
+    position: absolute !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+  }
+
+  ytmusic-player-bar #right-controls,
+  ytmusic-player-bar .right-controls,
+  ytmusic-player-bar .volume,
+  ytmusic-player-bar .like,
+  ytmusic-player-bar .dislike,
+  ytmusic-player-bar .repeat,
+  ytmusic-player-bar .shuffle,
+  ytmusic-player-bar .queue {
+    display: none !important;
+  }
+
   .drag-region {
     -webkit-app-region: drag;
     height: 28px;
