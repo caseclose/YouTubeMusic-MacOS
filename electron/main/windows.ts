@@ -944,7 +944,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-button-fix';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-cycle-fix';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
@@ -1019,7 +1019,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
               setThemeButtonHidden(false);
               return;
             }
-            const current = getCurrentThemeId();
+            const current = ensureMiniPlayer().dataset.theme || getCurrentThemeId();
             const index = themes.findIndex((theme) => theme.id === current);
             const next = themes[(index + 1) % themes.length].id;
             applyTheme(next);
@@ -1065,7 +1065,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         function applyTheme(themeId = getCurrentThemeId()) {
           const root = ensureMiniPlayer();
           const selected = themes.find((theme) => theme.id === themeId) || themes[0];
-          root.classList.remove(...themes.filter((theme) => theme.id !== 'classic').map((theme) => 'theme-' + theme.id));
+          themes.forEach((theme) => root.classList.remove('theme-' + theme.id));
           if (selected.id !== 'classic') {
             root.classList.add('theme-' + selected.id);
           }
