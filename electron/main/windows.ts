@@ -1405,6 +1405,7 @@ export function createMainWindow(): BrowserWindow {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show()
+    mainWindow?.focus()
   })
 
   mainWindow.on('close', (event) => {
