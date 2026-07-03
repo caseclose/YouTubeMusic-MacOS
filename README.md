@@ -34,6 +34,7 @@
 | 🎵 **完整网页体验** | 加载 [music.youtube.com](https://music.youtube.com)，搜索、播放列表、歌词、登录等功能与浏览器一致 |
 | 🖥️ **macOS 原生集成** | 菜单栏托盘、全局快捷键、控制中心 Now Playing、无边框窗口拖拽 |
 | 🎧 **媒体控制** | 键盘媒体键、托盘菜单播放控制、迷你播放器窗口 |
+| 🧩 **小窗体验** | 紧凑迷你播放器、置顶切换、进度拖动、音量、点赞 / 点踩、多主题 |
 | 🔐 **会话持久化** | Google 登录状态本地保存，重启后保持登录 |
 | 📦 **轻量可构建** | Electron + TypeScript，一键打包 `.dmg` 安装包 |
 
@@ -46,8 +47,9 @@
 | 播放 | 完整 YouTube Music 网页播放、歌词、队列 |
 | 登录 | Google 账号登录，OAuth 弹窗，会话持久化 |
 | 系统集成 | 媒体键、控制中心 / 锁屏 Now Playing（Media Session API） |
-| 窗口 | 无边框标题栏、顶部拖拽区域、关闭后保留在托盘 |
+| 窗口 | 无边框标题栏、顶部拖拽区域、关闭后保留在托盘、左上原生风格后退 / 前进 / 刷新 |
 | 托盘 | 播放 / 暂停 / 上一首 / 下一首、显示主窗口、退出 |
+| 迷你播放器 | 小尺寸浮窗、置顶切换、可拖动进度条、音量滑杆、点赞 / 点踩、主题切换 |
 | 快捷键 | `Cmd+Shift+M` 切换主窗口，`Cmd+Shift+P` 迷你播放器，`Cmd+L` 登录 |
 | 打包 | electron-builder 生成 macOS `.dmg` |
 
@@ -83,6 +85,47 @@ npm run dist:mac     # 打包 macOS 安装程序 → release/
 cp -R "release/mac-arm64/YouTube Music.app" /Applications/
 xattr -cr "/Applications/YouTube Music.app"
 ```
+
+覆盖安装已有版本：
+
+```bash
+osascript -e 'quit app "YouTube Music"' || true
+ditto "release/mac-arm64/YouTube Music.app" "/Applications/YouTube Music.app"
+xattr -cr "/Applications/YouTube Music.app"
+```
+
+---
+
+## 迷你播放器
+
+按 `Cmd+Shift+P` 或在托盘菜单中选择 **Toggle Mini Player** 可打开 / 隐藏迷你播放器。
+
+迷你播放器提供：
+
+- **播放控制**：上一首、播放 / 暂停、下一首
+- **进度控制**：拖动进度条跳转播放位置
+- **音量控制**：底部轻量音量滑杆
+- **反馈控制**：点赞 / 点踩当前播放内容
+- **置顶切换**：右上角图钉按钮可切换是否置于顶层
+- **多主题**：左上角调色板按钮循环切换主题
+- **主题按钮隐藏**：右键调色板按钮可隐藏 / 显示；隐藏后左上角仅保留很淡的 hover 热区
+
+内置主题：
+
+| 主题 | 风格 |
+|------|------|
+| 黑曜 | 默认深色玻璃质感 |
+| 午夜蓝 | 冷色蓝黑氛围 |
+| 暖橙 | 日落暖色调 |
+| 森林绿 | 低饱和自然绿 |
+| 霓虹 | 粉蓝赛博高光 |
+| 极光 | 青紫渐变氛围 |
+| 樱花 | 柔和粉色系 |
+| 葡萄紫 | 深紫高光 |
+| 拿铁 | 暖棕咖啡色 |
+| 冰川 | 冷白蓝灰 |
+
+主题选择和主题按钮隐藏状态会保存在本地，下次打开继续使用。
 
 ---
 
