@@ -1,9 +1,9 @@
-import { app, BrowserWindow } from 'electron'
+import { app } from 'electron'
 import { configureSession } from './session'
 import { initMediaService, stopMediaService, updateNowPlaying } from './media'
 import { initTray, refreshTrayMenu, destroyTray } from './tray'
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts'
-import { createMainWindow, setupPlayerStateIpc } from './windows'
+import { createMainWindow, setupPlayerStateIpc, showMainWindow } from './windows'
 import { setIsQuitting } from './app-state'
 import { applyCommandLineSwitches, applyUserAgentFallback } from './browser-spoof'
 import { createAppMenu } from './menu'
@@ -21,12 +21,7 @@ if (!gotTheLock) {
   app.quit()
 } else {
   app.on('second-instance', () => {
-    const win = BrowserWindow.getAllWindows().find((w) => w.getTitle() !== 'Mini Player')
-    if (win) {
-      if (win.isMinimized()) win.restore()
-      win.show()
-      win.focus()
-    }
+    showMainWindow()
   })
 
   app.whenReady().then(() => {
@@ -45,12 +40,7 @@ if (!gotTheLock) {
   })
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow()
-    } else {
-      const win = BrowserWindow.getAllWindows().find((w) => w.getTitle() !== 'Mini Player')
-      win?.show()
-    }
+    showMainWindow()
   })
 
   app.on('window-all-closed', () => {
