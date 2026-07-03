@@ -1,4 +1,10 @@
 export type PlayerControlAction = 'playPause' | 'next' | 'previous' | 'seek'
+export type NavigationCommand = 'back' | 'forward' | 'reload'
+
+export interface NavigationState {
+  canGoBack: boolean
+  canGoForward: boolean
+}
 
 export interface PlayerState {
   title: string

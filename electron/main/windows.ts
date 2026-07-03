@@ -2,6 +2,8 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import {
+  type NavigationCommand,
+  type NavigationState,
   SESSION_PARTITION,
   YTM_URL,
   type PlayerState
@@ -35,21 +37,75 @@ const MAIN_WINDOW_DRAG_CSS = `
     -webkit-app-region: no-drag !important;
   }
 
-  #ytm-electron-drag-left {
+  ytmusic-nav-bar {
+    padding-left: 218px !important;
+    box-sizing: border-box !important;
+  }
+
+  ytmusic-nav-bar #guide-button,
+  ytmusic-nav-bar ytmusic-guide-button-renderer,
+  ytmusic-nav-bar tp-yt-paper-icon-button[aria-label*="Guide"],
+  ytmusic-nav-bar yt-icon-button[aria-label*="Guide"] {
+    margin-left: 14px !important;
+  }
+
+  #ytm-electron-nav-toolbar {
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 84px !important;
-    height: 52px !important;
-    -webkit-app-region: drag !important;
+    top: 12px !important;
+    left: 84px !important;
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 3px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(44, 44, 46, 0.72) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.26) !important;
+    backdrop-filter: blur(18px) saturate(1.2) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.2) !important;
+    -webkit-app-region: no-drag !important;
     z-index: 2147483646 !important;
+  }
+
+  #ytm-electron-nav-toolbar button {
+    width: 30px !important;
+    height: 24px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    color: rgba(255, 255, 255, 0.78) !important;
     background: transparent !important;
+    font: inherit !important;
+    line-height: 1 !important;
+    cursor: default !important;
+    -webkit-app-region: no-drag !important;
+  }
+
+  #ytm-electron-nav-toolbar button:not(:disabled):hover {
+    color: rgba(255, 255, 255, 0.96) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  #ytm-electron-nav-toolbar button:disabled {
+    color: rgba(255, 255, 255, 0.28) !important;
+  }
+
+  #ytm-electron-nav-toolbar svg {
+    width: 17px !important;
+    height: 17px !important;
+    pointer-events: none !important;
+    stroke: currentColor !important;
   }
 
   #ytm-electron-drag-top {
     position: fixed !important;
     top: 0 !important;
-    left: 84px !important;
+    left: 202px !important;
     right: 0 !important;
     height: 14px !important;
     -webkit-app-region: drag !important;
@@ -58,6 +114,8 @@ const MAIN_WINDOW_DRAG_CSS = `
     pointer-events: auto !important;
   }
 `
+
+let navigationIpcRegistered = false
 
 const MINI_PLAYER_CSS = `
   #guide-wrapper,
@@ -137,6 +195,64 @@ function createBaseWebPreferences() {
   }
 }
 
+function getNavigationState(win: BrowserWindow | null): NavigationState {
+  if (!win || win.isDestroyed()) {
+    return { canGoBack: false, canGoForward: false }
+  }
+
+  return {
+    canGoBack: win.webContents.canGoBack(),
+    canGoForward: win.webContents.canGoForward()
+  }
+}
+
+function sendNavigationState(win: BrowserWindow): void {
+  if (win.isDestroyed()) return
+  win.webContents.send('navigation:state-changed', getNavigationState(win))
+}
+
+function setupNavigationControls(win: BrowserWindow): void {
+  if (!navigationIpcRegistered) {
+    navigationIpcRegistered = true
+
+    ipcMain.handle('navigation:command', (event, command: NavigationCommand) => {
+      const sourceWindow = BrowserWindow.fromWebContents(event.sender)
+      if (!sourceWindow || sourceWindow.isDestroyed() || sourceWindow !== mainWindow) {
+        return getNavigationState(sourceWindow)
+      }
+
+      switch (command) {
+        case 'back':
+          if (sourceWindow.webContents.canGoBack()) {
+            sourceWindow.webContents.goBack()
+          }
+          break
+        case 'forward':
+          if (sourceWindow.webContents.canGoForward()) {
+            sourceWindow.webContents.goForward()
+          }
+          break
+        case 'reload':
+          sourceWindow.webContents.reload()
+          break
+      }
+
+      sendNavigationState(sourceWindow)
+      return getNavigationState(sourceWindow)
+    })
+
+    ipcMain.handle('navigation:state', (event) => {
+      return getNavigationState(BrowserWindow.fromWebContents(event.sender))
+    })
+  }
+
+  const broadcast = () => sendNavigationState(win)
+  win.webContents.on('did-finish-load', broadcast)
+  win.webContents.on('did-navigate', broadcast)
+  win.webContents.on('did-navigate-in-page', broadcast)
+  win.webContents.on('did-stop-loading', broadcast)
+}
+
 async function injectPlayerBridge(win: BrowserWindow, mode: 'main' | 'mini' = 'main'): Promise<void> {
   const script = getInjectScript()
   if (!script) return
@@ -157,11 +273,59 @@ async function injectMainWindowDragRegion(win: BrowserWindow): Promise<void> {
     await win.webContents.executeJavaScript(
       `
       (() => {
-        if (!document.getElementById('ytm-electron-drag-left')) {
-          const left = document.createElement('div');
-          left.id = 'ytm-electron-drag-left';
-          document.body.appendChild(left);
+        const icons = {
+          back: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+          forward: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+          reload: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/></svg>'
+        };
+
+        const ensureToolbar = () => {
+          let toolbar = document.getElementById('ytm-electron-nav-toolbar');
+          if (toolbar) return toolbar;
+
+          toolbar = document.createElement('div');
+          toolbar.id = 'ytm-electron-nav-toolbar';
+          toolbar.setAttribute('aria-label', 'Navigation controls');
+          toolbar.innerHTML = [
+            ['back', '后退'],
+            ['forward', '前进'],
+            ['reload', '刷新']
+          ].map(([command, label]) => (
+            '<button type="button" data-command="' + command + '" aria-label="' + label + '" title="' + label + '">' +
+              icons[command] +
+            '</button>'
+          )).join('');
+
+          toolbar.addEventListener('click', async (event) => {
+            const button = event.target.closest('button[data-command]');
+            if (!button || button.disabled || !window.ytmBridge?.navigate) return;
+            const state = await window.ytmBridge.navigate(button.dataset.command);
+            updateToolbarState(state);
+          });
+
+          document.body.appendChild(toolbar);
+          return toolbar;
+        };
+
+        const updateToolbarState = (state) => {
+          const toolbar = ensureToolbar();
+          const back = toolbar.querySelector('[data-command="back"]');
+          const forward = toolbar.querySelector('[data-command="forward"]');
+          if (back) back.disabled = !state?.canGoBack;
+          if (forward) forward.disabled = !state?.canGoForward;
+        };
+
+        ensureToolbar();
+
+        if (window.ytmBridge?.getNavigationState) {
+          window.ytmBridge.getNavigationState().then(updateToolbarState).catch(() => {});
         }
+
+        if (window.ytmBridge?.onNavigationState && !window.__ytmNavigationStateListenerInstalled) {
+          window.__ytmNavigationStateListenerInstalled = true;
+          window.ytmBridge.onNavigationState(updateToolbarState);
+        }
+
         if (!document.getElementById('ytm-electron-drag-top')) {
           const top = document.createElement('div');
           top.id = 'ytm-electron-drag-top';
@@ -178,7 +342,11 @@ async function injectMainWindowDragRegion(win: BrowserWindow): Promise<void> {
 
 async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
   try {
-    const dragBar = `document.body.insertAdjacentHTML('afterbegin', '<div class="drag-region"></div>');`
+    const dragBar = `
+      if (!document.querySelector('.drag-region')) {
+        document.body.insertAdjacentHTML('afterbegin', '<div class="drag-region"></div>');
+      }
+    `
     await win.webContents.insertCSS(MINI_PLAYER_CSS)
     await win.webContents.executeJavaScript(dragBar, true)
   } catch (err) {
@@ -192,8 +360,10 @@ function setupPlayerBridgeInjection(win: BrowserWindow, mode: 'main' | 'mini'): 
   const reinject = async () => {
     const url = win.webContents.getURL()
     if (!url.includes('music.youtube.com')) return
-    if (url === lastInjectedUrl) return
-    lastInjectedUrl = url
+
+    if (url !== lastInjectedUrl) {
+      lastInjectedUrl = url
+    }
 
     await injectPlayerBridge(win, mode)
     if (mode === 'main') {
@@ -231,6 +401,7 @@ export function createMainWindow(): BrowserWindow {
   applyWebContentsSpoofing(mainWindow.webContents)
   setupWindowOpenHandler(mainWindow)
   setupNavigationGuards(mainWindow)
+  setupNavigationControls(mainWindow)
   setupPlayerBridgeInjection(mainWindow, 'main')
   registerPlayerWindow(mainWindow)
 

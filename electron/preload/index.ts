@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { PlayerControlAction, PlayerState } from '../types'
+import type { NavigationCommand, NavigationState, PlayerControlAction, PlayerState } from '../types'
 
 // Reduce Google/Electron browser detection surface in the page context.
 try {
@@ -21,5 +21,18 @@ contextBridge.exposeInMainWorld('ytmBridge', {
     }
     ipcRenderer.on('player:control', handler)
     return () => ipcRenderer.removeListener('player:control', handler)
+  },
+  navigate: (command: NavigationCommand) => {
+    return ipcRenderer.invoke('navigation:command', command) as Promise<NavigationState>
+  },
+  getNavigationState: () => {
+    return ipcRenderer.invoke('navigation:state') as Promise<NavigationState>
+  },
+  onNavigationState: (callback: (state: NavigationState) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, state: NavigationState) => {
+      callback(state)
+    }
+    ipcRenderer.on('navigation:state-changed', handler)
+    return () => ipcRenderer.removeListener('navigation:state-changed', handler)
   }
 })
