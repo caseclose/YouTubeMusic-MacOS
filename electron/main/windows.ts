@@ -384,6 +384,8 @@ const MINI_PLAYER_CSS = `
     transform: scale(0.72) !important;
     background: transparent !important;
     box-shadow: none !important;
+    pointer-events: none !important;
+    -webkit-app-region: drag !important;
   }
 
   #ytm-electron-mini-player .mini-pin:hover,
@@ -1001,6 +1003,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           });
 
           document.body.appendChild(root);
+          applyStoredThemeButtonVisibility(root);
           return root;
         }
 
@@ -1036,6 +1039,10 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           } catch {
             return false;
           }
+        }
+
+        function applyStoredThemeButtonVisibility(root = ensureMiniPlayer()) {
+          root.querySelector('.mini-theme').classList.toggle('is-hidden', isThemeButtonHidden());
         }
 
         function updateThemeButtonLabel(theme = themes.find((item) => item.id === getCurrentThemeId()) || themes[0]) {
