@@ -266,7 +266,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 22px !important;
+    gap: 16px !important;
     margin-top: auto !important;
     -webkit-app-region: no-drag !important;
   }
@@ -314,6 +314,11 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player button:hover {
     background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  #ytm-electron-mini-player button.is-active {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.18) !important;
   }
 
   #ytm-electron-mini-player button[data-action="playPause"] {
@@ -552,6 +557,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></svg>',
           pause: '<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z"/></svg>',
           next: '<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2V5ZM5 18.5v-13l9.5 6.5L5 18.5Z"/></svg>',
+          like: '<svg viewBox="0 0 24 24"><path d="M2 21h4V9H2v12Zm20-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 1 6.59 7.59C6.22 7.95 6 8.45 6 9v10c0 1.1.9 2 2 2h9c.82 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2Z"/></svg>',
+          dislike: '<svg viewBox="0 0 24 24"><path d="M22 3h-4v12h4V3ZM2 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L10.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2H7c-.82 0-1.54.5-1.84 1.22L2.14 11.27c-.09.23-.14.47-.14.73v2Z"/></svg>',
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
@@ -573,6 +580,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
                 '<button type="button" data-action="previous" aria-label="上一首">' + icons.previous + '</button>' +
                 '<button type="button" data-action="playPause" aria-label="播放/暂停">' + icons.play + '</button>' +
                 '<button type="button" data-action="next" aria-label="下一首">' + icons.next + '</button>' +
+                '<button type="button" data-action="like" aria-label="点赞">' + icons.like + '</button>' +
+                '<button type="button" data-action="dislike" aria-label="点踩">' + icons.dislike + '</button>' +
               '</div>' +
               '<label class="mini-volume">' +
                 icons.volume +
@@ -711,6 +720,44 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           return candidates[0] || '';
         }
 
+        function getFeedbackButton(kind) {
+          const positive = kind === 'like';
+          const selectors = positive
+            ? [
+                'ytmusic-player-bar button[aria-label*="Like"]',
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="Like"]',
+                'ytmusic-player-bar button[aria-label*="赞"]',
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="赞"]',
+                'button[aria-label*="Like"]',
+                'tp-yt-paper-icon-button[aria-label*="Like"]'
+              ]
+            : [
+                'ytmusic-player-bar button[aria-label*="Dislike"]',
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="Dislike"]',
+                'ytmusic-player-bar button[aria-label*="不喜欢"]',
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="不喜欢"]',
+                'ytmusic-player-bar button[aria-label*="踩"]',
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="踩"]',
+                'button[aria-label*="Dislike"]',
+                'tp-yt-paper-icon-button[aria-label*="Dislike"]'
+              ];
+
+          return queryButton(selectors);
+        }
+
+        function isFeedbackActive(kind) {
+          const button = getFeedbackButton(kind);
+          if (!button) return false;
+          const pressed = button.getAttribute('aria-pressed');
+          if (pressed) return pressed === 'true';
+
+          const label = (button.getAttribute('aria-label') || '').toLowerCase();
+          if (kind === 'like') {
+            return label.includes('liked') || label.includes('已赞') || label.includes('取消赞');
+          }
+          return label.includes('disliked') || label.includes('已踩') || label.includes('取消不喜欢');
+        }
+
         function formatTime(seconds) {
           if (!seconds || !Number.isFinite(seconds)) return '0:00';
           const whole = Math.max(0, Math.floor(seconds));
@@ -728,7 +775,9 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             isPlaying: video ? !video.paused && !video.ended : false,
             duration: video?.duration && Number.isFinite(video.duration) ? video.duration : 0,
             position: video?.currentTime && Number.isFinite(video.currentTime) ? video.currentTime : 0,
-            volume: video ? video.volume : 1
+            volume: video ? video.volume : 1,
+            liked: isFeedbackActive('like'),
+            disliked: isFeedbackActive('dislike')
           };
         }
 
@@ -767,6 +816,12 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
               '.previous-button',
               'tp-yt-paper-icon-button.previous'
             ]);
+            return;
+          }
+
+          if (action === 'like' || action === 'dislike') {
+            getFeedbackButton(action)?.click();
+            setTimeout(updateMiniPlayer, 120);
           }
         }
 
@@ -802,6 +857,9 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           if (document.activeElement !== volume) {
             volume.value = String(Math.round(state.volume * 100));
           }
+
+          root.querySelector('[data-action="like"]').classList.toggle('is-active', state.liked);
+          root.querySelector('[data-action="dislike"]').classList.toggle('is-active', state.disliked);
         }
 
         ensureMiniPlayer();
