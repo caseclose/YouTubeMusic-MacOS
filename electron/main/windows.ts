@@ -181,7 +181,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
-    padding: 34px 20px 14px !important;
+    padding: 32px 18px 12px !important;
     overflow: hidden !important;
     color: #fff !important;
     background: var(--mini-bg) !important;
@@ -254,9 +254,9 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-pin,
   #ytm-electron-mini-player .mini-theme {
     position: fixed !important;
-    top: 32px !important;
-    width: 26px !important;
-    height: 26px !important;
+    top: 31px !important;
+    width: 24px !important;
+    height: 24px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -269,11 +269,11 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-pin {
-    right: 16px !important;
+    right: 14px !important;
   }
 
   #ytm-electron-mini-player .mini-theme {
-    left: 16px !important;
+    left: 14px !important;
   }
 
   #ytm-electron-mini-player .mini-pin:hover,
@@ -296,15 +296,15 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-art {
-    width: min(76px, 24vw) !important;
-    height: min(76px, 24vw) !important;
-    margin: 0 auto 10px !important;
-    border-radius: 14px !important;
+    width: min(58px, 21vw) !important;
+    height: min(58px, 21vw) !important;
+    margin: 0 auto 8px !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     background: var(--mini-card) !important;
     box-shadow:
-      0 12px 30px rgba(0, 0, 0, 0.44),
+      0 10px 24px rgba(0, 0, 0, 0.42),
       inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     -webkit-app-region: no-drag !important;
   }
@@ -323,7 +323,7 @@ const MINI_PLAYER_CSS = `
     align-items: center !important;
     justify-content: center !important;
     color: rgba(255, 255, 255, 0.6) !important;
-    font-size: 27px !important;
+    font-size: 22px !important;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45) !important;
   }
 
@@ -336,25 +336,25 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-title {
-    min-height: 25px !important;
-    font-size: 20px !important;
+    min-height: 23px !important;
+    font-size: 18px !important;
     line-height: 1.25 !important;
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
   }
 
   #ytm-electron-mini-player .mini-artist {
-    min-height: 18px !important;
+    min-height: 16px !important;
     margin-top: 2px !important;
     color: rgba(255, 255, 255, 0.58) !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
     line-height: 1.35 !important;
   }
 
   #ytm-electron-mini-player .mini-progress {
     position: relative !important;
     height: 16px !important;
-    margin: 12px 0 4px !important;
+    margin: 9px 0 3px !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -405,7 +405,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     justify-content: space-between !important;
     color: rgba(255, 255, 255, 0.48) !important;
-    font-size: 11px !important;
+    font-size: 10px !important;
     font-variant-numeric: tabular-nums !important;
   }
 
@@ -413,7 +413,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 11px !important;
+    gap: 9px !important;
     margin-top: auto !important;
     -webkit-app-region: no-drag !important;
   }
@@ -422,8 +422,8 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    width: min(150px, 56vw) !important;
-    margin: 7px auto 0 !important;
+    width: min(128px, 54vw) !important;
+    margin: 6px auto 0 !important;
     color: rgba(255, 255, 255, 0.38) !important;
     opacity: 0.58 !important;
     -webkit-app-region: no-drag !important;
@@ -471,8 +471,8 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player button {
-    width: 34px !important;
-    height: 34px !important;
+    width: 30px !important;
+    height: 30px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -505,8 +505,8 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player button[data-action="playPause"] {
-    width: 46px !important;
-    height: 46px !important;
+    width: 40px !important;
+    height: 40px !important;
     color: var(--mini-accent-contrast) !important;
     background: var(--mini-accent) !important;
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.36) !important;
@@ -514,20 +514,20 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player button[data-action="like"],
   #ytm-electron-mini-player button[data-action="dislike"] {
-    width: 30px !important;
-    height: 30px !important;
+    width: 27px !important;
+    height: 27px !important;
     color: rgba(255, 255, 255, 0.58) !important;
   }
 
   #ytm-electron-mini-player button[data-action="like"] svg,
   #ytm-electron-mini-player button[data-action="dislike"] svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
   #ytm-electron-mini-player svg {
-    width: 19px !important;
-    height: 19px !important;
+    width: 17px !important;
+    height: 17px !important;
     fill: currentColor !important;
     pointer-events: none !important;
   }
@@ -790,7 +790,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-themed-mini';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-tiny-themed-mini';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const themes = [
           { id: 'classic', label: '黑曜' },
@@ -1275,10 +1275,10 @@ export function createMiniPlayerWindow(): BrowserWindow {
   }
 
   miniPlayerWindow = new BrowserWindow({
-    width: 360,
-    height: 280,
-    minWidth: 320,
-    minHeight: 260,
+    width: 300,
+    height: 240,
+    minWidth: 280,
+    minHeight: 220,
     title: 'Mini Player',
     frame: false,
     alwaysOnTop: miniPlayerAlwaysOnTop,
