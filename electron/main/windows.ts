@@ -171,6 +171,7 @@ const MINI_PLAYER_CSS = `
       radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 34%),
       linear-gradient(180deg, #1b1b1b 0%, #101010 100%) !important;
     z-index: 9999 !important;
+    -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player * {
@@ -238,20 +239,53 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-progress {
-    height: 6px !important;
+    position: relative !important;
+    height: 16px !important;
     margin: 14px 0 5px !important;
-    border-radius: 999px !important;
-    overflow: hidden !important;
-    background: rgba(255, 255, 255, 0.22) !important;
-    cursor: pointer !important;
     -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player .mini-progress-fill {
-    width: 0% !important;
-    height: 100% !important;
-    border-radius: inherit !important;
+    position: absolute !important;
+    top: 5px !important;
+    left: 0 !important;
+    height: 6px !important;
+    border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.86) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+
+  #ytm-electron-mini-player .mini-progress input {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 16px !important;
+    margin: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    -webkit-app-region: no-drag !important;
+    z-index: 2 !important;
+  }
+
+  #ytm-electron-mini-player .mini-progress input::-webkit-slider-runnable-track {
+    height: 6px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+  }
+
+  #ytm-electron-mini-player .mini-progress input::-webkit-slider-thumb {
+    width: 14px !important;
+    height: 14px !important;
+    margin-top: -4px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
   }
 
   #ytm-electron-mini-player .mini-time {
@@ -274,15 +308,22 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-volume {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    margin-top: 10px !important;
-    color: rgba(255, 255, 255, 0.62) !important;
+    gap: 8px !important;
+    width: min(180px, 58vw) !important;
+    margin: 8px auto 0 !important;
+    color: rgba(255, 255, 255, 0.46) !important;
+    opacity: 0.72 !important;
     -webkit-app-region: no-drag !important;
   }
 
+  #ytm-electron-mini-player .mini-volume:hover {
+    color: rgba(255, 255, 255, 0.72) !important;
+    opacity: 1 !important;
+  }
+
   #ytm-electron-mini-player .mini-volume svg {
-    width: 17px !important;
-    height: 17px !important;
+    width: 14px !important;
+    height: 14px !important;
     flex: 0 0 auto !important;
     fill: currentColor !important;
   }
@@ -290,11 +331,30 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-volume input {
     flex: 1 !important;
     min-width: 0 !important;
-    height: 18px !important;
+    height: 12px !important;
     margin: 0 !important;
-    accent-color: rgba(255, 255, 255, 0.9) !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: transparent !important;
     cursor: pointer !important;
     -webkit-app-region: no-drag !important;
+  }
+
+  #ytm-electron-mini-player .mini-volume input::-webkit-slider-runnable-track {
+    height: 4px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.28) !important;
+  }
+
+  #ytm-electron-mini-player .mini-volume input::-webkit-slider-thumb {
+    width: 12px !important;
+    height: 12px !important;
+    margin-top: -4px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: rgba(255, 255, 255, 0.88) !important;
   }
 
   #ytm-electron-mini-player button {
@@ -571,7 +631,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-feedback-controls';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-seek-range-muted-volume';
         const thumbnailCache = {
           key: '',
           url: '',
@@ -597,7 +657,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
               '<div class="mini-art"><div class="mini-fallback">♪</div><img alt="" hidden /></div>' +
               '<div class="mini-title">YouTube Music</div>' +
               '<div class="mini-artist"></div>' +
-              '<div class="mini-progress"><div class="mini-progress-fill"></div></div>' +
+              '<div class="mini-progress"><div class="mini-progress-fill"></div><input type="range" min="0" max="1000" value="0" aria-label="播放进度" /></div>' +
               '<div class="mini-time"><span data-role="position">0:00</span><span data-role="duration">0:00</span></div>' +
               '<div class="mini-controls">' +
                 '<button type="button" data-action="previous" aria-label="上一首">' + icons.previous + '</button>' +
@@ -618,32 +678,13 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             handleControl(button.dataset.action);
           });
 
-          const progress = root.querySelector('.mini-progress');
-          const seekFromEvent = (event) => {
+          const seek = root.querySelector('.mini-progress input');
+          seek.addEventListener('input', () => {
             const video = getVideo();
             if (!video || !video.duration || !Number.isFinite(video.duration)) return;
-            const rect = progress.getBoundingClientRect();
-            const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+            const ratio = Math.min(1, Math.max(0, Number(seek.value) / 1000));
             video.currentTime = ratio * video.duration;
             updateMiniPlayer();
-          };
-
-          let isSeeking = false;
-          progress.addEventListener('pointerdown', (event) => {
-            isSeeking = true;
-            progress.setPointerCapture?.(event.pointerId);
-            seekFromEvent(event);
-          });
-          progress.addEventListener('pointermove', (event) => {
-            if (isSeeking) seekFromEvent(event);
-          });
-          progress.addEventListener('pointerup', (event) => {
-            if (!isSeeking) return;
-            isSeeking = false;
-            seekFromEvent(event);
-          });
-          progress.addEventListener('pointercancel', () => {
-            isSeeking = false;
           });
 
           const volume = root.querySelector('.mini-volume input');
@@ -884,8 +925,12 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           root.querySelector('.mini-artist').textContent = state.artist || '';
           root.querySelector('[data-role="position"]').textContent = formatTime(state.position);
           root.querySelector('[data-role="duration"]').textContent = formatTime(state.duration);
-          root.querySelector('.mini-progress-fill').style.width =
-            state.duration > 0 ? Math.min(100, (state.position / state.duration) * 100) + '%' : '0%';
+          const progressRatio = state.duration > 0 ? Math.min(1, state.position / state.duration) : 0;
+          root.querySelector('.mini-progress-fill').style.width = (progressRatio * 100) + '%';
+          const seek = root.querySelector('.mini-progress input');
+          if (document.activeElement !== seek) {
+            seek.value = String(Math.round(progressRatio * 1000));
+          }
 
           const image = root.querySelector('.mini-art img');
           const fallback = root.querySelector('.mini-fallback');
