@@ -164,7 +164,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
-    padding: 36px 22px 18px !important;
+    padding: 34px 22px 16px !important;
     overflow: hidden !important;
     color: #fff !important;
     background:
@@ -179,13 +179,13 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-art {
-    width: min(128px, 34vw) !important;
-    height: min(128px, 34vw) !important;
-    margin: 0 auto 16px !important;
-    border-radius: 16px !important;
+    width: min(104px, 30vw) !important;
+    height: min(104px, 30vw) !important;
+    margin: 0 auto 12px !important;
+    border-radius: 14px !important;
     overflow: hidden !important;
     background: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38) !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -203,7 +203,7 @@ const MINI_PLAYER_CSS = `
     align-items: center !important;
     justify-content: center !important;
     color: rgba(255, 255, 255, 0.6) !important;
-    font-size: 42px !important;
+    font-size: 34px !important;
   }
 
   #ytm-electron-mini-player .mini-title,
@@ -215,8 +215,8 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-title {
-    min-height: 27px !important;
-    font-size: 22px !important;
+    min-height: 26px !important;
+    font-size: 21px !important;
     line-height: 1.25 !important;
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
@@ -224,7 +224,7 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player .mini-artist {
     min-height: 18px !important;
-    margin-top: 3px !important;
+    margin-top: 2px !important;
     color: rgba(255, 255, 255, 0.66) !important;
     font-size: 13px !important;
     line-height: 1.35 !important;
@@ -232,7 +232,7 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player .mini-progress {
     height: 4px !important;
-    margin: 18px 0 6px !important;
+    margin: 14px 0 5px !important;
     border-radius: 999px !important;
     overflow: hidden !important;
     background: rgba(255, 255, 255, 0.22) !important;
@@ -258,14 +258,14 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 24px !important;
+    gap: 22px !important;
     margin-top: auto !important;
     -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player button {
-    width: 42px !important;
-    height: 42px !important;
+    width: 38px !important;
+    height: 38px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -283,15 +283,15 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player button[data-action="playPause"] {
-    width: 58px !important;
-    height: 58px !important;
+    width: 50px !important;
+    height: 50px !important;
     color: #111 !important;
     background: rgba(255, 255, 255, 0.92) !important;
   }
 
   #ytm-electron-mini-player svg {
-    width: 23px !important;
-    height: 23px !important;
+    width: 21px !important;
+    height: 21px !important;
     fill: currentColor !important;
     pointer-events: none !important;
   }
@@ -592,12 +592,22 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         function getThumbnail() {
-          const img = queryButton([
+          const directImg = queryButton([
+            'ytmusic-player-bar #song-image img',
+            'ytmusic-player-bar .thumbnail-image-wrapper img',
+            'ytmusic-player-bar yt-img-shadow img',
             'ytmusic-player-bar img',
             '#player-bar-background img',
             '.ytmusic-player-bar img'
           ]);
-          return img?.src || img?.getAttribute('src') || '';
+          const directUrl = directImg?.currentSrc || directImg?.src || directImg?.getAttribute('src');
+          if (directUrl) return directUrl;
+
+          const candidates = Array.from(document.querySelectorAll('img'))
+            .map((img) => img.currentSrc || img.src || img.getAttribute('src') || '')
+            .filter((src) => src.includes('ytimg.com') || src.includes('googleusercontent.com'));
+
+          return candidates[0] || '';
         }
 
         function formatTime(seconds) {
@@ -781,9 +791,9 @@ export function createMiniPlayerWindow(): BrowserWindow {
 
   miniPlayerWindow = new BrowserWindow({
     width: 420,
-    height: 280,
+    height: 320,
     minWidth: 360,
-    minHeight: 220,
+    minHeight: 300,
     title: 'Mini Player',
     frame: false,
     alwaysOnTop: true,
