@@ -962,7 +962,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-hide-longpress';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-memory-store';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
@@ -983,6 +983,29 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           lastDeepScanAt: 0
         };
         let miniPlayerState = null;
+
+        // Mini player runs from a data: URL (opaque origin) where localStorage
+        // throws SecurityError, so keep state in memory with best-effort persist.
+        const memoryStore = {};
+
+        function readStore(key) {
+          if (key in memoryStore) return memoryStore[key];
+          try {
+            memoryStore[key] = localStorage.getItem(key);
+          } catch {
+            memoryStore[key] = null;
+          }
+          return memoryStore[key];
+        }
+
+        function writeStore(key, value) {
+          memoryStore[key] = value;
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            // ignore: opaque origin, memory store is source of truth
+          }
+        }
 
         function ensureMiniPlayer() {
           let root = document.getElementById('ytm-electron-mini-player');
@@ -1118,10 +1141,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         function getCurrentThemeId() {
-          try {
-            const stored = localStorage.getItem(THEME_STORAGE_KEY);
-            if (themes.some((theme) => theme.id === stored)) return stored;
-          } catch {}
+          const stored = readStore(THEME_STORAGE_KEY);
+          if (themes.some((theme) => theme.id === stored)) return stored;
           return 'classic';
         }
 
@@ -1138,17 +1159,11 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           button.classList.toggle('is-active', selected.id !== 'classic');
           updateThemeButtonLabel(selected);
 
-          try {
-            localStorage.setItem(THEME_STORAGE_KEY, selected.id);
-          } catch {}
+          writeStore(THEME_STORAGE_KEY, selected.id);
         }
 
         function isThemeButtonHidden() {
-          try {
-            return localStorage.getItem(THEME_BUTTON_HIDDEN_KEY) === '1';
-          } catch {
-            return false;
-          }
+          return readStore(THEME_BUTTON_HIDDEN_KEY) === '1';
         }
 
         function applyStoredThemeButtonVisibility(root = ensureMiniPlayer()) {
@@ -1170,9 +1185,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         function setThemeButtonHidden(hidden) {
-          try {
-            localStorage.setItem(THEME_BUTTON_HIDDEN_KEY, hidden ? '1' : '0');
-          } catch {}
+          writeStore(THEME_BUTTON_HIDDEN_KEY, hidden ? '1' : '0');
           updateThemeButtonLabel();
         }
 
