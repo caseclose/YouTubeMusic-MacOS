@@ -562,12 +562,21 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-feedback-controls';
+
         function ensureMiniPlayer() {
           let root = document.getElementById('ytm-electron-mini-player');
-          if (root) return root;
+          if (root?.dataset.uiVersion === MINI_PLAYER_UI_VERSION && root.querySelector('.mini-volume')) {
+            return root;
+          }
+
+          if (root) {
+            root.remove();
+          }
 
           root = document.createElement('div');
           root.id = 'ytm-electron-mini-player';
+          root.dataset.uiVersion = MINI_PLAYER_UI_VERSION;
           root.innerHTML =
             '<div class="mini-loading">等待 YouTube Music 播放状态...</div>' +
             '<div class="mini-content">' +
