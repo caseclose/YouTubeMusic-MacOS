@@ -129,11 +129,12 @@ const MINI_PLAYER_CSS = `
   #guide-wrapper,
   #guide-content,
   ytmusic-nav-bar,
-  #content-wrapper > :not(ytmusic-player-bar),
+  #content-wrapper,
   #masthead,
   .search-box,
-  iron-pages > :not([selected]),
+  iron-pages,
   #player-page,
+  ytmusic-player-bar,
   ytmusic-browse-response,
   ytmusic-home-page,
   ytmusic-search-page,
@@ -152,128 +153,171 @@ const MINI_PLAYER_CSS = `
     background: #0f0f0f !important;
   }
 
-  ytmusic-app-layout {
-    min-height: 100vh !important;
-  }
-
-  ytmusic-player-bar {
-    display: block !important;
-  }
-
-  ytmusic-player-bar {
+  #ytm-electron-mini-player {
     position: fixed !important;
-    top: 28px !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: calc(100vh - 28px) !important;
-    min-height: 0 !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
     box-sizing: border-box !important;
+    padding: 36px 22px 18px !important;
     overflow: hidden !important;
-    background: linear-gradient(180deg, #181818 0%, #111 100%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 34%),
+      linear-gradient(180deg, #1b1b1b 0%, #101010 100%) !important;
     z-index: 9999 !important;
   }
 
-  ytmusic-player-bar *,
-  ytmusic-player-bar ::before,
-  ytmusic-player-bar ::after {
+  #ytm-electron-mini-player * {
     box-sizing: border-box !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif !important;
   }
 
-  ytmusic-player-bar #progress-bar,
-  ytmusic-player-bar .progress-bar,
-  ytmusic-player-bar tp-yt-paper-progress,
-  ytmusic-player-bar ytmusic-player-bar-progress {
-    position: absolute !important;
-    top: 0 !important;
-    left: 10px !important;
-    right: 10px !important;
-    width: auto !important;
-    z-index: 2 !important;
-  }
-
-  ytmusic-player-bar #main-panel,
-  ytmusic-player-bar .main-panel {
-    height: 100% !important;
-    min-height: 0 !important;
-  }
-
-  ytmusic-player-bar .content-info-wrapper,
-  ytmusic-player-bar .song-info,
-  ytmusic-player-bar #song-info {
-    position: absolute !important;
-    left: 24px !important;
-    right: 24px !important;
-    bottom: 86px !important;
-    max-width: calc(100vw - 48px) !important;
-    min-width: 0 !important;
+  #ytm-electron-mini-player .mini-art {
+    width: min(128px, 34vw) !important;
+    height: min(128px, 34vw) !important;
+    margin: 0 auto 16px !important;
+    border-radius: 16px !important;
     overflow: hidden !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38) !important;
+    -webkit-app-region: no-drag !important;
   }
 
-  ytmusic-player-bar .title,
-  ytmusic-player-bar .subtitle,
-  ytmusic-player-bar .byline,
-  ytmusic-player-bar yt-formatted-string {
-    max-width: 100% !important;
+  #ytm-electron-mini-player .mini-art img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: cover !important;
+  }
+
+  #ytm-electron-mini-player .mini-fallback {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 42px !important;
+  }
+
+  #ytm-electron-mini-player .mini-title,
+  #ytm-electron-mini-player .mini-artist {
+    text-align: center !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
 
-  ytmusic-player-bar .title {
+  #ytm-electron-mini-player .mini-title {
+    min-height: 27px !important;
     font-size: 22px !important;
     line-height: 1.25 !important;
-    color: #fff !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
   }
 
-  ytmusic-player-bar .byline,
-  ytmusic-player-bar .subtitle {
+  #ytm-electron-mini-player .mini-artist {
+    min-height: 18px !important;
+    margin-top: 3px !important;
+    color: rgba(255, 255, 255, 0.66) !important;
     font-size: 13px !important;
-    color: rgba(255, 255, 255, 0.68) !important;
+    line-height: 1.35 !important;
   }
 
-  ytmusic-player-bar img,
-  ytmusic-player-bar #song-image img,
-  ytmusic-player-bar .thumbnail-image-wrapper img {
-    width: 76px !important;
-    height: 76px !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
+  #ytm-electron-mini-player .mini-progress {
+    height: 4px !important;
+    margin: 18px 0 6px !important;
+    border-radius: 999px !important;
+    overflow: hidden !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    -webkit-app-region: no-drag !important;
   }
 
-  ytmusic-player-bar #left-controls,
-  ytmusic-player-bar .left-controls,
-  ytmusic-player-bar #center-controls,
-  ytmusic-player-bar .center-controls,
-  ytmusic-player-bar .middle-controls {
-    position: absolute !important;
-    left: 16px !important;
-    right: 16px !important;
-    bottom: 22px !important;
+  #ytm-electron-mini-player .mini-progress-fill {
+    width: 0% !important;
+    height: 100% !important;
+    border-radius: inherit !important;
+    background: rgba(255, 255, 255, 0.86) !important;
+  }
+
+  #ytm-electron-mini-player .mini-time {
+    display: flex !important;
+    justify-content: space-between !important;
+    color: rgba(255, 255, 255, 0.52) !important;
+    font-size: 11px !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+
+  #ytm-electron-mini-player .mini-controls {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 14px !important;
-    min-width: 0 !important;
+    gap: 24px !important;
+    margin-top: auto !important;
+    -webkit-app-region: no-drag !important;
   }
 
-  ytmusic-player-bar #right-controls,
-  ytmusic-player-bar .right-controls,
-  ytmusic-player-bar .volume,
-  ytmusic-player-bar .like,
-  ytmusic-player-bar .dislike,
-  ytmusic-player-bar .repeat,
-  ytmusic-player-bar .shuffle,
-  ytmusic-player-bar .queue {
+  #ytm-electron-mini-player button {
+    width: 42px !important;
+    height: 42px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    background: transparent !important;
+    -webkit-app-region: no-drag !important;
+  }
+
+  #ytm-electron-mini-player button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  #ytm-electron-mini-player button[data-action="playPause"] {
+    width: 58px !important;
+    height: 58px !important;
+    color: #111 !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+  }
+
+  #ytm-electron-mini-player svg {
+    width: 23px !important;
+    height: 23px !important;
+    fill: currentColor !important;
+    pointer-events: none !important;
+  }
+
+  #ytm-electron-mini-player .mini-loading {
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: rgba(255, 255, 255, 0.54) !important;
+    font-size: 13px !important;
+  }
+
+  #ytm-electron-mini-player.has-track .mini-loading {
+    display: none !important;
+  }
+
+  #ytm-electron-mini-player:not(.has-track) .mini-content {
     display: none !important;
   }
 
   .drag-region {
     -webkit-app-region: drag;
     height: 28px;
-    background: #1a1a1a;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     position: fixed;
     top: 0;
     left: 0;
@@ -463,13 +507,196 @@ async function injectMainWindowDragRegion(win: BrowserWindow): Promise<void> {
 
 async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
   try {
-    const dragBar = `
-      if (!document.querySelector('.drag-region')) {
-        document.body.insertAdjacentHTML('afterbegin', '<div class="drag-region"></div>');
-      }
+    const miniPlayerUi = `
+      (() => {
+        if (!document.querySelector('.drag-region')) {
+          document.body.insertAdjacentHTML('afterbegin', '<div class="drag-region"></div>');
+        }
+
+        const icons = {
+          previous: '<svg viewBox="0 0 24 24"><path d="M6 5h2v14H6V5Zm3.5 7L19 5.5v13L9.5 12Z"/></svg>',
+          play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></svg>',
+          pause: '<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z"/></svg>',
+          next: '<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2V5ZM5 18.5v-13l9.5 6.5L5 18.5Z"/></svg>'
+        };
+
+        function ensureMiniPlayer() {
+          let root = document.getElementById('ytm-electron-mini-player');
+          if (root) return root;
+
+          root = document.createElement('div');
+          root.id = 'ytm-electron-mini-player';
+          root.innerHTML =
+            '<div class="mini-loading">等待 YouTube Music 播放状态...</div>' +
+            '<div class="mini-content">' +
+              '<div class="mini-art"><div class="mini-fallback">♪</div><img alt="" hidden /></div>' +
+              '<div class="mini-title">YouTube Music</div>' +
+              '<div class="mini-artist"></div>' +
+              '<div class="mini-progress"><div class="mini-progress-fill"></div></div>' +
+              '<div class="mini-time"><span data-role="position">0:00</span><span data-role="duration">0:00</span></div>' +
+              '<div class="mini-controls">' +
+                '<button type="button" data-action="previous" aria-label="上一首">' + icons.previous + '</button>' +
+                '<button type="button" data-action="playPause" aria-label="播放/暂停">' + icons.play + '</button>' +
+                '<button type="button" data-action="next" aria-label="下一首">' + icons.next + '</button>' +
+              '</div>' +
+            '</div>';
+
+          root.addEventListener('click', (event) => {
+            const button = event.target.closest('button[data-action]');
+            if (!button) return;
+            handleControl(button.dataset.action);
+          });
+
+          document.body.appendChild(root);
+          return root;
+        }
+
+        function queryButton(selectors) {
+          for (const selector of selectors) {
+            const el = document.querySelector(selector);
+            if (el) return el;
+          }
+          return null;
+        }
+
+        function clickButton(selectors) {
+          const button = queryButton(selectors);
+          if (!button) return false;
+          button.click();
+          return true;
+        }
+
+        function getVideo() {
+          return document.querySelector('video');
+        }
+
+        function textFrom(selectors) {
+          const el = queryButton(selectors);
+          return el?.textContent?.trim() || '';
+        }
+
+        function getTitle() {
+          return textFrom([
+            'ytmusic-player-bar .title',
+            'ytmusic-player-bar a.yt-simple-endpoint',
+            '.ytmusic-player-bar .title'
+          ]) || document.title.replace(' - YouTube Music', '').trim();
+        }
+
+        function getArtist() {
+          return textFrom([
+            'ytmusic-player-bar .byline',
+            'ytmusic-player-bar .subtitle',
+            'ytmusic-player-bar yt-formatted-string.byline'
+          ]);
+        }
+
+        function getThumbnail() {
+          const img = queryButton([
+            'ytmusic-player-bar img',
+            '#player-bar-background img',
+            '.ytmusic-player-bar img'
+          ]);
+          return img?.src || img?.getAttribute('src') || '';
+        }
+
+        function formatTime(seconds) {
+          if (!seconds || !Number.isFinite(seconds)) return '0:00';
+          const whole = Math.max(0, Math.floor(seconds));
+          const minutes = Math.floor(whole / 60);
+          const rest = String(whole % 60).padStart(2, '0');
+          return minutes + ':' + rest;
+        }
+
+        function getState() {
+          const video = getVideo();
+          return {
+            title: getTitle(),
+            artist: getArtist(),
+            thumbnail: getThumbnail(),
+            isPlaying: video ? !video.paused && !video.ended : false,
+            duration: video?.duration && Number.isFinite(video.duration) ? video.duration : 0,
+            position: video?.currentTime && Number.isFinite(video.currentTime) ? video.currentTime : 0
+          };
+        }
+
+        function handleControl(action) {
+          const video = getVideo();
+
+          if (action === 'playPause') {
+            if (video) {
+              if (video.paused) video.play().catch(() => {});
+              else video.pause();
+            } else {
+              clickButton([
+                'button[aria-label*="Pause"]',
+                'button[aria-label*="Play"]',
+                'tp-yt-paper-icon-button.play-pause-button',
+                '#play-pause-button'
+              ]);
+            }
+            return;
+          }
+
+          if (action === 'next') {
+            clickButton([
+              'button[aria-label*="Next"]',
+              'button[aria-label*="next"]',
+              '.next-button',
+              'tp-yt-paper-icon-button.next'
+            ]);
+            return;
+          }
+
+          if (action === 'previous') {
+            clickButton([
+              'button[aria-label*="Previous"]',
+              'button[aria-label*="previous"]',
+              '.previous-button',
+              'tp-yt-paper-icon-button.previous'
+            ]);
+          }
+        }
+
+        function updateMiniPlayer() {
+          const root = ensureMiniPlayer();
+          const state = getState();
+          const hasTrack = Boolean(state.title && state.title !== 'YouTube Music');
+          root.classList.toggle('has-track', hasTrack);
+
+          root.querySelector('.mini-title').textContent = state.title || 'YouTube Music';
+          root.querySelector('.mini-artist').textContent = state.artist || '';
+          root.querySelector('[data-role="position"]').textContent = formatTime(state.position);
+          root.querySelector('[data-role="duration"]').textContent = formatTime(state.duration);
+          root.querySelector('.mini-progress-fill').style.width =
+            state.duration > 0 ? Math.min(100, (state.position / state.duration) * 100) + '%' : '0%';
+
+          const image = root.querySelector('.mini-art img');
+          const fallback = root.querySelector('.mini-fallback');
+          if (state.thumbnail) {
+            image.hidden = false;
+            image.src = state.thumbnail;
+            fallback.style.display = 'none';
+          } else {
+            image.hidden = true;
+            image.removeAttribute('src');
+            fallback.style.display = 'flex';
+          }
+
+          const playButton = root.querySelector('[data-action="playPause"]');
+          playButton.innerHTML = state.isPlaying ? icons.pause : icons.play;
+        }
+
+        ensureMiniPlayer();
+        updateMiniPlayer();
+
+        if (!window.__ytmMiniPlayerInterval) {
+          window.__ytmMiniPlayerInterval = window.setInterval(updateMiniPlayer, 500);
+        }
+      })();
     `
     await win.webContents.insertCSS(MINI_PLAYER_CSS)
-    await win.webContents.executeJavaScript(dragBar, true)
+    await win.webContents.executeJavaScript(miniPlayerUi, true)
   } catch (err) {
     console.error('Failed to inject mini player styles:', err)
   }
