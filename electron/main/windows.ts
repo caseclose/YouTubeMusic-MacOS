@@ -157,6 +157,20 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player {
+    --mini-accent: rgba(255, 255, 255, 0.94);
+    --mini-accent-contrast: #111;
+    --mini-bg:
+      radial-gradient(circle at 50% -18%, rgba(255, 255, 255, 0.2), transparent 30%),
+      radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.07), transparent 28%),
+      linear-gradient(180deg, #202020 0%, #111 58%, #0c0c0c 100%);
+    --mini-card:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
+      rgba(255, 255, 255, 0.07);
+    --mini-button-bg: rgba(255, 255, 255, 0.04);
+    --mini-button-hover: rgba(255, 255, 255, 0.1);
+    --mini-button-active: rgba(255, 255, 255, 0.16);
+    --mini-track: rgba(255, 255, 255, 0.22);
+    --mini-volume-track: rgba(255, 255, 255, 0.2);
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -170,11 +184,59 @@ const MINI_PLAYER_CSS = `
     padding: 34px 20px 14px !important;
     overflow: hidden !important;
     color: #fff !important;
-    background:
-      radial-gradient(circle at 50% -18%, rgba(255, 255, 255, 0.2), transparent 30%),
-      radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.07), transparent 28%),
-      linear-gradient(180deg, #202020 0%, #111 58%, #0c0c0c 100%) !important;
+    background: var(--mini-bg) !important;
     z-index: 9999 !important;
+  }
+
+  #ytm-electron-mini-player.theme-midnight {
+    --mini-accent: #dbeafe;
+    --mini-accent-contrast: #07111f;
+    --mini-bg:
+      radial-gradient(circle at 48% -16%, rgba(96, 165, 250, 0.32), transparent 31%),
+      radial-gradient(circle at 10% 18%, rgba(59, 130, 246, 0.14), transparent 30%),
+      linear-gradient(180deg, #172033 0%, #0b1020 62%, #070a12 100%);
+    --mini-card:
+      linear-gradient(160deg, rgba(147, 197, 253, 0.2), rgba(30, 64, 175, 0.08)),
+      rgba(15, 23, 42, 0.48);
+    --mini-button-bg: rgba(147, 197, 253, 0.08);
+    --mini-button-hover: rgba(147, 197, 253, 0.16);
+    --mini-button-active: rgba(147, 197, 253, 0.22);
+    --mini-track: rgba(191, 219, 254, 0.22);
+    --mini-volume-track: rgba(191, 219, 254, 0.18);
+  }
+
+  #ytm-electron-mini-player.theme-sunset {
+    --mini-accent: #fed7aa;
+    --mini-accent-contrast: #1c0d05;
+    --mini-bg:
+      radial-gradient(circle at 52% -18%, rgba(251, 146, 60, 0.34), transparent 31%),
+      radial-gradient(circle at 8% 12%, rgba(244, 63, 94, 0.18), transparent 28%),
+      linear-gradient(180deg, #2a1a14 0%, #160f0d 62%, #0c0807 100%);
+    --mini-card:
+      linear-gradient(160deg, rgba(253, 186, 116, 0.2), rgba(244, 63, 94, 0.07)),
+      rgba(41, 22, 14, 0.5);
+    --mini-button-bg: rgba(253, 186, 116, 0.08);
+    --mini-button-hover: rgba(253, 186, 116, 0.16);
+    --mini-button-active: rgba(253, 186, 116, 0.22);
+    --mini-track: rgba(254, 215, 170, 0.22);
+    --mini-volume-track: rgba(254, 215, 170, 0.18);
+  }
+
+  #ytm-electron-mini-player.theme-forest {
+    --mini-accent: #bbf7d0;
+    --mini-accent-contrast: #03140a;
+    --mini-bg:
+      radial-gradient(circle at 52% -18%, rgba(74, 222, 128, 0.27), transparent 31%),
+      radial-gradient(circle at 10% 12%, rgba(20, 184, 166, 0.13), transparent 29%),
+      linear-gradient(180deg, #14231b 0%, #09140f 62%, #050a07 100%);
+    --mini-card:
+      linear-gradient(160deg, rgba(134, 239, 172, 0.16), rgba(20, 184, 166, 0.07)),
+      rgba(10, 31, 20, 0.5);
+    --mini-button-bg: rgba(187, 247, 208, 0.07);
+    --mini-button-hover: rgba(187, 247, 208, 0.15);
+    --mini-button-active: rgba(187, 247, 208, 0.2);
+    --mini-track: rgba(187, 247, 208, 0.22);
+    --mini-volume-track: rgba(187, 247, 208, 0.18);
   }
 
   #ytm-electron-mini-player * {
@@ -189,10 +251,10 @@ const MINI_PLAYER_CSS = `
     flex-direction: column !important;
   }
 
-  #ytm-electron-mini-player .mini-pin {
+  #ytm-electron-mini-player .mini-pin,
+  #ytm-electron-mini-player .mini-theme {
     position: fixed !important;
     top: 32px !important;
-    right: 16px !important;
     width: 26px !important;
     height: 26px !important;
     display: inline-flex !important;
@@ -206,18 +268,29 @@ const MINI_PLAYER_CSS = `
     z-index: 10001 !important;
   }
 
-  #ytm-electron-mini-player .mini-pin:hover {
+  #ytm-electron-mini-player .mini-pin {
+    right: 16px !important;
+  }
+
+  #ytm-electron-mini-player .mini-theme {
+    left: 16px !important;
+  }
+
+  #ytm-electron-mini-player .mini-pin:hover,
+  #ytm-electron-mini-player .mini-theme:hover {
     color: rgba(255, 255, 255, 0.9) !important;
     background: rgba(255, 255, 255, 0.13) !important;
   }
 
-  #ytm-electron-mini-player .mini-pin.is-active {
-    color: #111 !important;
-    background: rgba(255, 255, 255, 0.9) !important;
+  #ytm-electron-mini-player .mini-pin.is-active,
+  #ytm-electron-mini-player .mini-theme.is-active {
+    color: var(--mini-accent-contrast) !important;
+    background: var(--mini-accent) !important;
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28) !important;
   }
 
-  #ytm-electron-mini-player .mini-pin svg {
+  #ytm-electron-mini-player .mini-pin svg,
+  #ytm-electron-mini-player .mini-theme svg {
     width: 13px !important;
     height: 13px !important;
   }
@@ -229,9 +302,7 @@ const MINI_PLAYER_CSS = `
     border-radius: 14px !important;
     overflow: hidden !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    background:
-      linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
-      rgba(255, 255, 255, 0.07) !important;
+    background: var(--mini-card) !important;
     box-shadow:
       0 12px 30px rgba(0, 0, 0, 0.44),
       inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
@@ -293,7 +364,7 @@ const MINI_PLAYER_CSS = `
     left: 0 !important;
     height: 6px !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.86) !important;
+    background: var(--mini-accent) !important;
     pointer-events: none !important;
     z-index: 1 !important;
   }
@@ -315,7 +386,7 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-progress input::-webkit-slider-runnable-track {
     height: 6px !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.22) !important;
+    background: var(--mini-track) !important;
   }
 
   #ytm-electron-mini-player .mini-progress input::-webkit-slider-thumb {
@@ -326,7 +397,7 @@ const MINI_PLAYER_CSS = `
     border-radius: 999px !important;
     appearance: none !important;
     -webkit-appearance: none !important;
-    background: rgba(255, 255, 255, 0.96) !important;
+    background: var(--mini-accent) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
   }
 
@@ -385,7 +456,7 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-volume input::-webkit-slider-runnable-track {
     height: 4px !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: var(--mini-volume-track) !important;
   }
 
   #ytm-electron-mini-player .mini-volume input::-webkit-slider-thumb {
@@ -396,7 +467,7 @@ const MINI_PLAYER_CSS = `
     border-radius: 999px !important;
     appearance: none !important;
     -webkit-appearance: none !important;
-    background: rgba(255, 255, 255, 0.74) !important;
+    background: var(--mini-accent) !important;
   }
 
   #ytm-electron-mini-player button {
@@ -410,18 +481,18 @@ const MINI_PLAYER_CSS = `
     border: 0 !important;
     border-radius: 999px !important;
     color: rgba(255, 255, 255, 0.7) !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--mini-button-bg) !important;
     -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player button:hover {
     color: rgba(255, 255, 255, 0.95) !important;
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: var(--mini-button-hover) !important;
   }
 
   #ytm-electron-mini-player button.is-active {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.16) !important;
+    background: var(--mini-button-active) !important;
   }
 
   #ytm-electron-mini-player button:disabled {
@@ -436,8 +507,8 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player button[data-action="playPause"] {
     width: 46px !important;
     height: 46px !important;
-    color: #111 !important;
-    background: rgba(255, 255, 255, 0.94) !important;
+    color: var(--mini-accent-contrast) !important;
+    background: var(--mini-accent) !important;
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.36) !important;
   }
 
@@ -715,10 +786,18 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           like: '<svg viewBox="0 0 24 24"><path d="M2 21h4V9H2v12Zm20-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 1 6.59 7.59C6.22 7.95 6 8.45 6 9v10c0 1.1.9 2 2 2h9c.82 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2Z"/></svg>',
           dislike: '<svg viewBox="0 0 24 24"><path d="M22 3h-4v12h4V3ZM2 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L10.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2H7c-.82 0-1.54.5-1.84 1.22L2.14 11.27c-.09.23-.14.47-.14.73v2Z"/></svg>',
           pin: '<svg viewBox="0 0 24 24"><path d="M14 2l8 8-2 2-2-2-4.5 4.5V20l-1.5 1.5L8.5 18 3 23l-2-2 5-5.5L2.5 12 4 10.5h5.5L14 6l-2-2 2-2Z"/></svg>',
+          theme: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18h1.5a1.8 1.8 0 0 0 1.27-3.07 1.8 1.8 0 0 1 1.27-3.07H18a6 6 0 0 0 0-12h-6Zm-4 9.2a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm2.2-4.6a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm2.2 4.6a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z"/></svg>',
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-compact-window';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-themed-mini';
+        const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
+        const themes = [
+          { id: 'classic', label: '黑曜' },
+          { id: 'midnight', label: '午夜蓝' },
+          { id: 'sunset', label: '暖橙' },
+          { id: 'forest', label: '森林绿' }
+        ];
         const thumbnailCache = {
           key: '',
           url: '',
@@ -739,6 +818,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           root.id = 'ytm-electron-mini-player';
           root.dataset.uiVersion = MINI_PLAYER_UI_VERSION;
           root.innerHTML =
+            '<button type="button" class="mini-theme" aria-label="切换主题" title="切换主题">' + icons.theme + '</button>' +
             '<button type="button" class="mini-pin" aria-label="取消置顶" title="取消置顶">' + icons.pin + '</button>' +
             '<div class="mini-loading">等待 YouTube Music 播放状态...</div>' +
             '<div class="mini-content">' +
@@ -772,6 +852,13 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             updatePinState(state);
           });
 
+          root.querySelector('.mini-theme').addEventListener('click', () => {
+            const current = getCurrentThemeId();
+            const index = themes.findIndex((theme) => theme.id === current);
+            const next = themes[(index + 1) % themes.length].id;
+            applyTheme(next);
+          });
+
           const seek = root.querySelector('.mini-progress input');
           seek.addEventListener('input', () => {
             const video = getVideo();
@@ -791,6 +878,33 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
           document.body.appendChild(root);
           return root;
+        }
+
+        function getCurrentThemeId() {
+          try {
+            const stored = localStorage.getItem(THEME_STORAGE_KEY);
+            if (themes.some((theme) => theme.id === stored)) return stored;
+          } catch {}
+          return 'classic';
+        }
+
+        function applyTheme(themeId = getCurrentThemeId()) {
+          const root = ensureMiniPlayer();
+          const selected = themes.find((theme) => theme.id === themeId) || themes[0];
+          root.classList.remove(...themes.filter((theme) => theme.id !== 'classic').map((theme) => 'theme-' + theme.id));
+          if (selected.id !== 'classic') {
+            root.classList.add('theme-' + selected.id);
+          }
+          root.dataset.theme = selected.id;
+
+          const button = root.querySelector('.mini-theme');
+          button.classList.toggle('is-active', selected.id !== 'classic');
+          button.setAttribute('title', '主题：' + selected.label);
+          button.setAttribute('aria-label', '切换主题，当前：' + selected.label);
+
+          try {
+            localStorage.setItem(THEME_STORAGE_KEY, selected.id);
+          } catch {}
         }
 
         function updatePinState(state) {
@@ -1067,6 +1181,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         ensureMiniPlayer();
+        applyTheme();
         refreshPinState();
         updateMiniPlayer();
 
