@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import {
+  type MiniPlayerWindowState,
   type NavigationCommand,
   type NavigationState,
   SESSION_PARTITION,
@@ -15,6 +16,7 @@ import { getIsQuitting } from './app-state'
 
 let mainWindow: BrowserWindow | null = null
 let miniPlayerWindow: BrowserWindow | null = null
+let miniPlayerAlwaysOnTop = true
 
 const MAIN_WINDOW_DRAG_CSS = `
   ytmusic-nav-bar {
@@ -116,6 +118,7 @@ const MAIN_WINDOW_DRAG_CSS = `
 `
 
 let navigationIpcRegistered = false
+let miniPlayerWindowIpcRegistered = false
 
 const MINI_PLAYER_CSS = `
   html,
@@ -185,6 +188,39 @@ const MINI_PLAYER_CSS = `
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
+  }
+
+  #ytm-electron-mini-player .mini-pin {
+    position: fixed !important;
+    top: 34px !important;
+    right: 18px !important;
+    width: 30px !important;
+    height: 30px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    color: rgba(255, 255, 255, 0.48) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    -webkit-app-region: no-drag !important;
+    z-index: 10001 !important;
+  }
+
+  #ytm-electron-mini-player .mini-pin:hover {
+    color: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.13) !important;
+  }
+
+  #ytm-electron-mini-player .mini-pin.is-active {
+    color: #111 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  #ytm-electron-mini-player .mini-pin svg {
+    width: 15px !important;
+    height: 15px !important;
   }
 
   #ytm-electron-mini-player .mini-art {
@@ -506,6 +542,34 @@ function sendNavigationState(win: BrowserWindow): void {
   win.webContents.send('navigation:state-changed', getNavigationState(win))
 }
 
+function getMiniPlayerWindowState(): MiniPlayerWindowState {
+  return { alwaysOnTop: miniPlayerAlwaysOnTop }
+}
+
+function setupMiniPlayerWindowControls(): void {
+  if (miniPlayerWindowIpcRegistered) return
+  miniPlayerWindowIpcRegistered = true
+
+  ipcMain.handle('mini-player:window-state', (event) => {
+    const sourceWindow = BrowserWindow.fromWebContents(event.sender)
+    if (sourceWindow !== miniPlayerWindow) {
+      return getMiniPlayerWindowState()
+    }
+    return getMiniPlayerWindowState()
+  })
+
+  ipcMain.handle('mini-player:toggle-always-on-top', (event) => {
+    const sourceWindow = BrowserWindow.fromWebContents(event.sender)
+    if (!sourceWindow || sourceWindow.isDestroyed() || sourceWindow !== miniPlayerWindow) {
+      return getMiniPlayerWindowState()
+    }
+
+    miniPlayerAlwaysOnTop = !miniPlayerAlwaysOnTop
+    sourceWindow.setAlwaysOnTop(miniPlayerAlwaysOnTop)
+    return getMiniPlayerWindowState()
+  })
+}
+
 function setupNavigationControls(win: BrowserWindow): void {
   if (!navigationIpcRegistered) {
     navigationIpcRegistered = true
@@ -650,10 +714,11 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           next: '<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2V5ZM5 18.5v-13l9.5 6.5L5 18.5Z"/></svg>',
           like: '<svg viewBox="0 0 24 24"><path d="M2 21h4V9H2v12Zm20-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 1 6.59 7.59C6.22 7.95 6 8.45 6 9v10c0 1.1.9 2 2 2h9c.82 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2Z"/></svg>',
           dislike: '<svg viewBox="0 0 24 24"><path d="M22 3h-4v12h4V3ZM2 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L10.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2H7c-.82 0-1.54.5-1.84 1.22L2.14 11.27c-.09.23-.14.47-.14.73v2Z"/></svg>',
+          pin: '<svg viewBox="0 0 24 24"><path d="M14 2l8 8-2 2-2-2-4.5 4.5V20l-1.5 1.5L8.5 18 3 23l-2-2 5-5.5L2.5 12 4 10.5h5.5L14 6l-2-2 2-2Z"/></svg>',
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-seek-range-muted-volume';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-pin-window';
         const thumbnailCache = {
           key: '',
           url: '',
@@ -674,6 +739,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           root.id = 'ytm-electron-mini-player';
           root.dataset.uiVersion = MINI_PLAYER_UI_VERSION;
           root.innerHTML =
+            '<button type="button" class="mini-pin" aria-label="取消置顶" title="取消置顶">' + icons.pin + '</button>' +
             '<div class="mini-loading">等待 YouTube Music 播放状态...</div>' +
             '<div class="mini-content">' +
               '<div class="mini-art"><div class="mini-fallback">♪</div><img alt="" hidden /></div>' +
@@ -700,6 +766,12 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             handleControl(button.dataset.action);
           });
 
+          root.querySelector('.mini-pin').addEventListener('click', async () => {
+            if (!window.ytmBridge?.toggleMiniPlayerAlwaysOnTop) return;
+            const state = await window.ytmBridge.toggleMiniPlayerAlwaysOnTop();
+            updatePinState(state);
+          });
+
           const seek = root.querySelector('.mini-progress input');
           seek.addEventListener('input', () => {
             const video = getVideo();
@@ -719,6 +791,20 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
           document.body.appendChild(root);
           return root;
+        }
+
+        function updatePinState(state) {
+          const root = ensureMiniPlayer();
+          const pin = root.querySelector('.mini-pin');
+          const enabled = state?.alwaysOnTop !== false;
+          pin.classList.toggle('is-active', enabled);
+          pin.setAttribute('aria-label', enabled ? '取消置顶' : '置于顶层');
+          pin.setAttribute('title', enabled ? '取消置顶' : '置于顶层');
+        }
+
+        function refreshPinState() {
+          if (!window.ytmBridge?.getMiniPlayerWindowState) return;
+          window.ytmBridge.getMiniPlayerWindowState().then(updatePinState).catch(() => {});
         }
 
         function queryButton(selectors) {
@@ -981,6 +1067,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         ensureMiniPlayer();
+        refreshPinState();
         updateMiniPlayer();
 
         if (!window.__ytmMiniPlayerInterval) {
@@ -1079,7 +1166,7 @@ export function createMiniPlayerWindow(): BrowserWindow {
     minHeight: 300,
     title: 'Mini Player',
     frame: false,
-    alwaysOnTop: true,
+    alwaysOnTop: miniPlayerAlwaysOnTop,
     resizable: true,
     skipTaskbar: true,
     show: false,
@@ -1090,6 +1177,7 @@ export function createMiniPlayerWindow(): BrowserWindow {
 
   miniPlayerWindow.webContents.setUserAgent(CHROME_UA)
   applyWebContentsSpoofing(miniPlayerWindow.webContents)
+  setupMiniPlayerWindowControls()
   setupPlayerBridgeInjection(miniPlayerWindow, 'mini')
   registerPlayerWindow(miniPlayerWindow)
 

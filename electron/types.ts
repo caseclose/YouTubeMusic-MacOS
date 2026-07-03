@@ -6,6 +6,10 @@ export interface NavigationState {
   canGoForward: boolean
 }
 
+export interface MiniPlayerWindowState {
+  alwaysOnTop: boolean
+}
+
 export interface PlayerState {
   title: string
   artist: string

@@ -1,5 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { NavigationCommand, NavigationState, PlayerControlAction, PlayerState } from '../types'
+import type {
+  MiniPlayerWindowState,
+  NavigationCommand,
+  NavigationState,
+  PlayerControlAction,
+  PlayerState
+} from '../types'
 
 // Reduce Google/Electron browser detection surface in the page context.
 try {
@@ -34,5 +40,11 @@ contextBridge.exposeInMainWorld('ytmBridge', {
     }
     ipcRenderer.on('navigation:state-changed', handler)
     return () => ipcRenderer.removeListener('navigation:state-changed', handler)
+  },
+  getMiniPlayerWindowState: () => {
+    return ipcRenderer.invoke('mini-player:window-state') as Promise<MiniPlayerWindowState>
+  },
+  toggleMiniPlayerAlwaysOnTop: () => {
+    return ipcRenderer.invoke('mini-player:toggle-always-on-top') as Promise<MiniPlayerWindowState>
   }
 })
