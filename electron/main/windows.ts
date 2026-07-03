@@ -164,12 +164,13 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
-    padding: 34px 22px 16px !important;
+    padding: 36px 24px 16px !important;
     overflow: hidden !important;
     color: #fff !important;
     background:
-      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 34%),
-      linear-gradient(180deg, #1b1b1b 0%, #101010 100%) !important;
+      radial-gradient(circle at 50% -18%, rgba(255, 255, 255, 0.2), transparent 30%),
+      radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.07), transparent 28%),
+      linear-gradient(180deg, #202020 0%, #111 58%, #0c0c0c 100%) !important;
     z-index: 9999 !important;
     -webkit-app-region: no-drag !important;
   }
@@ -187,13 +188,18 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-art {
-    width: min(96px, 28vw) !important;
-    height: min(96px, 28vw) !important;
-    margin: 0 auto 12px !important;
-    border-radius: 14px !important;
+    width: min(102px, 29vw) !important;
+    height: min(102px, 29vw) !important;
+    margin: 0 auto 14px !important;
+    border-radius: 18px !important;
     overflow: hidden !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
+      rgba(255, 255, 255, 0.07) !important;
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, 0.48),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -211,7 +217,8 @@ const MINI_PLAYER_CSS = `
     align-items: center !important;
     justify-content: center !important;
     color: rgba(255, 255, 255, 0.6) !important;
-    font-size: 34px !important;
+    font-size: 36px !important;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45) !important;
   }
 
   #ytm-electron-mini-player .mini-title,
@@ -223,17 +230,17 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-title {
-    min-height: 26px !important;
-    font-size: 21px !important;
+    min-height: 28px !important;
+    font-size: 22px !important;
     line-height: 1.25 !important;
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
   }
 
   #ytm-electron-mini-player .mini-artist {
-    min-height: 18px !important;
-    margin-top: 2px !important;
-    color: rgba(255, 255, 255, 0.66) !important;
+    min-height: 19px !important;
+    margin-top: 3px !important;
+    color: rgba(255, 255, 255, 0.58) !important;
     font-size: 13px !important;
     line-height: 1.35 !important;
   }
@@ -241,7 +248,7 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-progress {
     position: relative !important;
     height: 16px !important;
-    margin: 14px 0 5px !important;
+    margin: 16px 0 5px !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -291,7 +298,7 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-time {
     display: flex !important;
     justify-content: space-between !important;
-    color: rgba(255, 255, 255, 0.52) !important;
+    color: rgba(255, 255, 255, 0.48) !important;
     font-size: 11px !important;
     font-variant-numeric: tabular-nums !important;
   }
@@ -300,7 +307,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 16px !important;
+    gap: 14px !important;
     margin-top: auto !important;
     -webkit-app-region: no-drag !important;
   }
@@ -310,14 +317,14 @@ const MINI_PLAYER_CSS = `
     align-items: center !important;
     gap: 8px !important;
     width: min(180px, 58vw) !important;
-    margin: 8px auto 0 !important;
-    color: rgba(255, 255, 255, 0.46) !important;
-    opacity: 0.72 !important;
+    margin: 9px auto 0 !important;
+    color: rgba(255, 255, 255, 0.38) !important;
+    opacity: 0.58 !important;
     -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player .mini-volume:hover {
-    color: rgba(255, 255, 255, 0.72) !important;
+    color: rgba(255, 255, 255, 0.68) !important;
     opacity: 1 !important;
   }
 
@@ -343,7 +350,7 @@ const MINI_PLAYER_CSS = `
   #ytm-electron-mini-player .mini-volume input::-webkit-slider-runnable-track {
     height: 4px !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.28) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
   }
 
   #ytm-electron-mini-player .mini-volume input::-webkit-slider-thumb {
@@ -354,7 +361,7 @@ const MINI_PLAYER_CSS = `
     border-radius: 999px !important;
     appearance: none !important;
     -webkit-appearance: none !important;
-    background: rgba(255, 255, 255, 0.88) !important;
+    background: rgba(255, 255, 255, 0.74) !important;
   }
 
   #ytm-electron-mini-player button {
@@ -367,18 +374,19 @@ const MINI_PLAYER_CSS = `
     padding: 0 !important;
     border: 0 !important;
     border-radius: 999px !important;
-    color: rgba(255, 255, 255, 0.88) !important;
-    background: transparent !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player button:hover {
+    color: rgba(255, 255, 255, 0.95) !important;
     background: rgba(255, 255, 255, 0.1) !important;
   }
 
   #ytm-electron-mini-player button.is-active {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.16) !important;
   }
 
   #ytm-electron-mini-player button:disabled {
@@ -394,7 +402,21 @@ const MINI_PLAYER_CSS = `
     width: 50px !important;
     height: 50px !important;
     color: #111 !important;
-    background: rgba(255, 255, 255, 0.92) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.36) !important;
+  }
+
+  #ytm-electron-mini-player button[data-action="like"],
+  #ytm-electron-mini-player button[data-action="dislike"] {
+    width: 34px !important;
+    height: 34px !important;
+    color: rgba(255, 255, 255, 0.58) !important;
+  }
+
+  #ytm-electron-mini-player button[data-action="like"] svg,
+  #ytm-electron-mini-player button[data-action="dislike"] svg {
+    width: 18px !important;
+    height: 18px !important;
   }
 
   #ytm-electron-mini-player svg {
