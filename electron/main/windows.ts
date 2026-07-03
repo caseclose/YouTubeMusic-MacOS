@@ -403,6 +403,15 @@ const MINI_PLAYER_CSS = `
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28) !important;
   }
 
+  #ytm-electron-mini-player .mini-theme.is-hidden,
+  #ytm-electron-mini-player .mini-theme.is-hidden.is-active {
+    opacity: 0.08 !important;
+    transform: scale(0.72) !important;
+    color: rgba(255, 255, 255, 0.26) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
   #ytm-electron-mini-player .mini-pin svg,
   #ytm-electron-mini-player .mini-theme svg {
     width: 13px !important;
@@ -935,7 +944,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-fancy-themes';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-button-fix';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
@@ -1008,6 +1017,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           root.querySelector('.mini-theme').addEventListener('click', () => {
             if (isThemeButtonHidden()) {
               setThemeButtonHidden(false);
+              return;
             }
             const current = getCurrentThemeId();
             const index = themes.findIndex((theme) => theme.id === current);
