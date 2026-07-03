@@ -405,11 +405,29 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player .mini-theme.is-hidden,
   #ytm-electron-mini-player .mini-theme.is-hidden.is-active {
-    opacity: 0.08 !important;
-    transform: scale(0.72) !important;
-    color: rgba(255, 255, 255, 0.26) !important;
-    background: transparent !important;
+    width: 8px !important;
+    height: 8px !important;
+    top: 39px !important;
+    left: 22px !important;
+    opacity: 0.36 !important;
+    transform: none !important;
+    color: transparent !important;
+    background: rgba(255, 255, 255, 0.28) !important;
     box-shadow: none !important;
+  }
+
+  #ytm-electron-mini-player .mini-theme.is-hidden svg {
+    display: none !important;
+  }
+
+  #ytm-electron-mini-player .mini-theme.is-hidden:hover,
+  #ytm-electron-mini-player .mini-theme.is-hidden.is-active:hover {
+    width: 12px !important;
+    height: 12px !important;
+    top: 37px !important;
+    left: 20px !important;
+    opacity: 0.72 !important;
+    background: rgba(255, 255, 255, 0.5) !important;
   }
 
   #ytm-electron-mini-player .mini-pin svg,
@@ -944,7 +962,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-cycle-fix';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-dot-hide';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
@@ -1097,8 +1115,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           const button = root.querySelector('.mini-theme');
           const hidden = isThemeButtonHidden();
           button.classList.toggle('is-hidden', hidden);
-          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '右键显示主题按钮' : '点击切换，右键隐藏按钮'));
-          button.setAttribute('aria-label', '切换主题，当前：' + theme.label);
+          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '点击或右键显示主题按钮' : '点击切换，右键隐藏为小圆点'));
+          button.setAttribute('aria-label', (hidden ? '显示主题按钮' : '切换主题') + '，当前：' + theme.label);
         }
 
         function toggleThemeButtonHidden() {
