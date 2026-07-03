@@ -321,6 +321,15 @@ const MINI_PLAYER_CSS = `
     background: rgba(255, 255, 255, 0.18) !important;
   }
 
+  #ytm-electron-mini-player button:disabled {
+    opacity: 0.32 !important;
+    cursor: default !important;
+  }
+
+  #ytm-electron-mini-player button:disabled:hover {
+    background: transparent !important;
+  }
+
   #ytm-electron-mini-player button[data-action="playPause"] {
     width: 50px !important;
     height: 50px !important;
@@ -563,6 +572,11 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         };
 
         const MINI_PLAYER_UI_VERSION = '2026-07-03-feedback-controls';
+        const thumbnailCache = {
+          key: '',
+          url: '',
+          lastDeepScanAt: 0
+        };
 
         function ensureMiniPlayer() {
           let root = document.getElementById('ytm-electron-mini-player');
@@ -684,7 +698,19 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           ]);
         }
 
-        function getThumbnail() {
+        function cacheThumbnail(trackKey, url) {
+          thumbnailCache.key = trackKey;
+          thumbnailCache.url = url || '';
+          return thumbnailCache.url;
+        }
+
+        function getThumbnail(trackKey) {
+          if (thumbnailCache.key !== trackKey) {
+            thumbnailCache.key = trackKey;
+            thumbnailCache.url = '';
+            thumbnailCache.lastDeepScanAt = 0;
+          }
+
           const mediaSessionArtwork = navigator.mediaSession?.metadata?.artwork;
           if (mediaSessionArtwork?.length) {
             const sorted = Array.from(mediaSessionArtwork).sort((a, b) => {
@@ -692,7 +718,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
               const bSize = Number.parseInt(b.sizes || '0', 10) || 0;
               return bSize - aSize;
             });
-            if (sorted[0]?.src) return sorted[0].src;
+            if (sorted[0]?.src) return cacheThumbnail(trackKey, sorted[0].src);
           }
 
           const directImg = queryButton([
@@ -704,7 +730,17 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             '.ytmusic-player-bar img'
           ]);
           const directUrl = directImg?.currentSrc || directImg?.src || directImg?.getAttribute('src');
-          if (directUrl) return directUrl;
+          if (directUrl) return cacheThumbnail(trackKey, directUrl);
+
+          if (thumbnailCache.url) {
+            return thumbnailCache.url;
+          }
+
+          const now = Date.now();
+          if (now - thumbnailCache.lastDeepScanAt < 5000) {
+            return '';
+          }
+          thumbnailCache.lastDeepScanAt = now;
 
           const nodes = [];
           const visit = (root) => {
@@ -726,7 +762,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             return urls;
           }).filter((src) => src && (src.includes('ytimg.com') || src.includes('googleusercontent.com')));
 
-          return candidates[0] || '';
+          return cacheThumbnail(trackKey, candidates[0] || '');
         }
 
         function getFeedbackButton(kind) {
@@ -736,9 +772,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
                 'ytmusic-player-bar button[aria-label*="Like"]',
                 'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="Like"]',
                 'ytmusic-player-bar button[aria-label*="赞"]',
-                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="赞"]',
-                'button[aria-label*="Like"]',
-                'tp-yt-paper-icon-button[aria-label*="Like"]'
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="赞"]'
               ]
             : [
                 'ytmusic-player-bar button[aria-label*="Dislike"]',
@@ -746,9 +780,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
                 'ytmusic-player-bar button[aria-label*="不喜欢"]',
                 'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="不喜欢"]',
                 'ytmusic-player-bar button[aria-label*="踩"]',
-                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="踩"]',
-                'button[aria-label*="Dislike"]',
-                'tp-yt-paper-icon-button[aria-label*="Dislike"]'
+                'ytmusic-player-bar tp-yt-paper-icon-button[aria-label*="踩"]'
               ];
 
           return queryButton(selectors);
@@ -777,14 +809,22 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
         function getState() {
           const video = getVideo();
+          const title = getTitle();
+          const artist = getArtist();
+          const trackKey = \`\${title}\\n\${artist}\`;
+          const likeButton = getFeedbackButton('like');
+          const dislikeButton = getFeedbackButton('dislike');
+
           return {
-            title: getTitle(),
-            artist: getArtist(),
-            thumbnail: getThumbnail(),
+            title,
+            artist,
+            thumbnail: getThumbnail(trackKey),
             isPlaying: video ? !video.paused && !video.ended : false,
             duration: video?.duration && Number.isFinite(video.duration) ? video.duration : 0,
             position: video?.currentTime && Number.isFinite(video.currentTime) ? video.currentTime : 0,
             volume: video ? video.volume : 1,
+            canLike: Boolean(likeButton),
+            canDislike: Boolean(dislikeButton),
             liked: isFeedbackActive('like'),
             disliked: isFeedbackActive('dislike')
           };
@@ -869,6 +909,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
           root.querySelector('[data-action="like"]').classList.toggle('is-active', state.liked);
           root.querySelector('[data-action="dislike"]').classList.toggle('is-active', state.disliked);
+          root.querySelector('[data-action="like"]').disabled = !state.canLike;
+          root.querySelector('[data-action="dislike"]').disabled = !state.canDislike;
         }
 
         ensureMiniPlayer();
