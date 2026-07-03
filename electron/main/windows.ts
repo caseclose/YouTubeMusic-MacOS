@@ -167,7 +167,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
-    padding: 36px 24px 16px !important;
+    padding: 34px 20px 14px !important;
     overflow: hidden !important;
     color: #fff !important;
     background:
@@ -191,10 +191,10 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player .mini-pin {
     position: fixed !important;
-    top: 34px !important;
-    right: 18px !important;
-    width: 30px !important;
-    height: 30px !important;
+    top: 32px !important;
+    right: 16px !important;
+    width: 26px !important;
+    height: 26px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -218,22 +218,22 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-pin svg {
-    width: 15px !important;
-    height: 15px !important;
+    width: 13px !important;
+    height: 13px !important;
   }
 
   #ytm-electron-mini-player .mini-art {
-    width: min(102px, 29vw) !important;
-    height: min(102px, 29vw) !important;
-    margin: 0 auto 14px !important;
-    border-radius: 18px !important;
+    width: min(76px, 24vw) !important;
+    height: min(76px, 24vw) !important;
+    margin: 0 auto 10px !important;
+    border-radius: 14px !important;
     overflow: hidden !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     background:
       linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
       rgba(255, 255, 255, 0.07) !important;
     box-shadow:
-      0 18px 42px rgba(0, 0, 0, 0.48),
+      0 12px 30px rgba(0, 0, 0, 0.44),
       inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     -webkit-app-region: no-drag !important;
   }
@@ -252,7 +252,7 @@ const MINI_PLAYER_CSS = `
     align-items: center !important;
     justify-content: center !important;
     color: rgba(255, 255, 255, 0.6) !important;
-    font-size: 36px !important;
+    font-size: 27px !important;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45) !important;
   }
 
@@ -265,25 +265,25 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-title {
-    min-height: 28px !important;
-    font-size: 22px !important;
+    min-height: 25px !important;
+    font-size: 20px !important;
     line-height: 1.25 !important;
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
   }
 
   #ytm-electron-mini-player .mini-artist {
-    min-height: 19px !important;
-    margin-top: 3px !important;
+    min-height: 18px !important;
+    margin-top: 2px !important;
     color: rgba(255, 255, 255, 0.58) !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     line-height: 1.35 !important;
   }
 
   #ytm-electron-mini-player .mini-progress {
     position: relative !important;
     height: 16px !important;
-    margin: 16px 0 5px !important;
+    margin: 12px 0 4px !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -342,7 +342,7 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 14px !important;
+    gap: 11px !important;
     margin-top: auto !important;
     -webkit-app-region: no-drag !important;
   }
@@ -351,8 +351,8 @@ const MINI_PLAYER_CSS = `
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    width: min(180px, 58vw) !important;
-    margin: 9px auto 0 !important;
+    width: min(150px, 56vw) !important;
+    margin: 7px auto 0 !important;
     color: rgba(255, 255, 255, 0.38) !important;
     opacity: 0.58 !important;
     -webkit-app-region: no-drag !important;
@@ -400,8 +400,8 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player button {
-    width: 38px !important;
-    height: 38px !important;
+    width: 34px !important;
+    height: 34px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -434,8 +434,8 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player button[data-action="playPause"] {
-    width: 50px !important;
-    height: 50px !important;
+    width: 46px !important;
+    height: 46px !important;
     color: #111 !important;
     background: rgba(255, 255, 255, 0.94) !important;
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.36) !important;
@@ -443,20 +443,20 @@ const MINI_PLAYER_CSS = `
 
   #ytm-electron-mini-player button[data-action="like"],
   #ytm-electron-mini-player button[data-action="dislike"] {
-    width: 34px !important;
-    height: 34px !important;
+    width: 30px !important;
+    height: 30px !important;
     color: rgba(255, 255, 255, 0.58) !important;
   }
 
   #ytm-electron-mini-player button[data-action="like"] svg,
   #ytm-electron-mini-player button[data-action="dislike"] svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
 
   #ytm-electron-mini-player svg {
-    width: 21px !important;
-    height: 21px !important;
+    width: 19px !important;
+    height: 19px !important;
     fill: currentColor !important;
     pointer-events: none !important;
   }
@@ -718,7 +718,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-pin-window';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-compact-window';
         const thumbnailCache = {
           key: '',
           url: '',
@@ -1160,10 +1160,10 @@ export function createMiniPlayerWindow(): BrowserWindow {
   }
 
   miniPlayerWindow = new BrowserWindow({
-    width: 420,
-    height: 320,
-    minWidth: 360,
-    minHeight: 300,
+    width: 360,
+    height: 280,
+    minWidth: 320,
+    minHeight: 260,
     title: 'Mini Player',
     frame: false,
     alwaysOnTop: miniPlayerAlwaysOnTop,
