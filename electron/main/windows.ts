@@ -962,7 +962,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
-        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-hide-pointer';
+        const MINI_PLAYER_UI_VERSION = '2026-07-03-theme-hide-longpress';
         const THEME_STORAGE_KEY = 'ytm-mini-player-theme';
         const THEME_BUTTON_HIDDEN_KEY = 'ytm-mini-player-theme-button-hidden';
         const themes = [
@@ -1033,7 +1033,43 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           });
 
           const themeButton = root.querySelector('.mini-theme');
+          let themeLongPressTimer = null;
+          let themeLongPressFired = false;
+
+          const clearThemeLongPress = () => {
+            if (themeLongPressTimer) {
+              clearTimeout(themeLongPressTimer);
+              themeLongPressTimer = null;
+            }
+          };
+
+          themeButton.addEventListener('pointerdown', (event) => {
+            themeLongPressFired = false;
+            if (event.button === 2) {
+              event.preventDefault();
+              event.stopPropagation();
+              themeLongPressFired = true;
+              toggleThemeButtonHidden();
+              return;
+            }
+            if (event.button !== 0) return;
+            clearThemeLongPress();
+            themeLongPressTimer = setTimeout(() => {
+              themeLongPressFired = true;
+              toggleThemeButtonHidden();
+            }, 450);
+          });
+
+          themeButton.addEventListener('pointerup', clearThemeLongPress);
+          themeButton.addEventListener('pointerleave', clearThemeLongPress);
+          themeButton.addEventListener('pointercancel', clearThemeLongPress);
+
           themeButton.addEventListener('click', (event) => {
+            clearThemeLongPress();
+            if (themeLongPressFired) {
+              themeLongPressFired = false;
+              return;
+            }
             if (event.altKey) {
               event.preventDefault();
               toggleThemeButtonHidden();
@@ -1049,17 +1085,12 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             applyTheme(next);
           });
 
-          themeButton.addEventListener('pointerdown', (event) => {
-            if (event.button !== 2) return;
-            event.preventDefault();
-            event.stopPropagation();
-            toggleThemeButtonHidden();
-          });
-
           themeButton.addEventListener('contextmenu', (event) => {
             event.preventDefault();
             event.stopPropagation();
-            toggleThemeButtonHidden();
+            if (!themeLongPressFired) {
+              toggleThemeButtonHidden();
+            }
           });
 
           const seek = root.querySelector('.mini-progress input');
@@ -1129,7 +1160,7 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           const button = root.querySelector('.mini-theme');
           const hidden = isThemeButtonHidden();
           button.classList.toggle('is-hidden', hidden);
-          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '点击或右键显示主题按钮' : '点击切换，右键或 Option+点击隐藏为小圆点'));
+          button.setAttribute('title', '主题：' + theme.label + '；' + (hidden ? '点击显示主题按钮' : '点击切换，长按或右键隐藏为小圆点'));
           button.setAttribute('aria-label', (hidden ? '显示主题按钮' : '切换主题') + '，当前：' + theme.label);
         }
 
