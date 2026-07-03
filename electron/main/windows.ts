@@ -178,9 +178,16 @@ const MINI_PLAYER_CSS = `
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif !important;
   }
 
+  #ytm-electron-mini-player .mini-content {
+    flex: 1 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
   #ytm-electron-mini-player .mini-art {
-    width: min(104px, 30vw) !important;
-    height: min(104px, 30vw) !important;
+    width: min(96px, 28vw) !important;
+    height: min(96px, 28vw) !important;
     margin: 0 auto 12px !important;
     border-radius: 14px !important;
     overflow: hidden !important;
@@ -231,11 +238,12 @@ const MINI_PLAYER_CSS = `
   }
 
   #ytm-electron-mini-player .mini-progress {
-    height: 4px !important;
+    height: 6px !important;
     margin: 14px 0 5px !important;
     border-radius: 999px !important;
     overflow: hidden !important;
     background: rgba(255, 255, 255, 0.22) !important;
+    cursor: pointer !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -260,6 +268,32 @@ const MINI_PLAYER_CSS = `
     justify-content: center !important;
     gap: 22px !important;
     margin-top: auto !important;
+    -webkit-app-region: no-drag !important;
+  }
+
+  #ytm-electron-mini-player .mini-volume {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+    color: rgba(255, 255, 255, 0.62) !important;
+    -webkit-app-region: no-drag !important;
+  }
+
+  #ytm-electron-mini-player .mini-volume svg {
+    width: 17px !important;
+    height: 17px !important;
+    flex: 0 0 auto !important;
+    fill: currentColor !important;
+  }
+
+  #ytm-electron-mini-player .mini-volume input {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 18px !important;
+    margin: 0 !important;
+    accent-color: rgba(255, 255, 255, 0.9) !important;
+    cursor: pointer !important;
     -webkit-app-region: no-drag !important;
   }
 
@@ -517,7 +551,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           previous: '<svg viewBox="0 0 24 24"><path d="M6 5h2v14H6V5Zm3.5 7L19 5.5v13L9.5 12Z"/></svg>',
           play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></svg>',
           pause: '<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z"/></svg>',
-          next: '<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2V5ZM5 18.5v-13l9.5 6.5L5 18.5Z"/></svg>'
+          next: '<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2V5ZM5 18.5v-13l9.5 6.5L5 18.5Z"/></svg>',
+          volume: '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a4.5 4.5 0 0 0-2.2-3.87v7.74A4.5 4.5 0 0 0 16.5 12Zm-2.2-8.3v2.08a7 7 0 0 1 0 12.44v2.08a9 9 0 0 0 0-16.6Z"/></svg>'
         };
 
         function ensureMiniPlayer() {
@@ -539,12 +574,52 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
                 '<button type="button" data-action="playPause" aria-label="播放/暂停">' + icons.play + '</button>' +
                 '<button type="button" data-action="next" aria-label="下一首">' + icons.next + '</button>' +
               '</div>' +
+              '<label class="mini-volume">' +
+                icons.volume +
+                '<input type="range" min="0" max="100" value="100" aria-label="音量" />' +
+              '</label>' +
             '</div>';
 
           root.addEventListener('click', (event) => {
             const button = event.target.closest('button[data-action]');
             if (!button) return;
             handleControl(button.dataset.action);
+          });
+
+          const progress = root.querySelector('.mini-progress');
+          const seekFromEvent = (event) => {
+            const video = getVideo();
+            if (!video || !video.duration || !Number.isFinite(video.duration)) return;
+            const rect = progress.getBoundingClientRect();
+            const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+            video.currentTime = ratio * video.duration;
+            updateMiniPlayer();
+          };
+
+          let isSeeking = false;
+          progress.addEventListener('pointerdown', (event) => {
+            isSeeking = true;
+            progress.setPointerCapture?.(event.pointerId);
+            seekFromEvent(event);
+          });
+          progress.addEventListener('pointermove', (event) => {
+            if (isSeeking) seekFromEvent(event);
+          });
+          progress.addEventListener('pointerup', (event) => {
+            if (!isSeeking) return;
+            isSeeking = false;
+            seekFromEvent(event);
+          });
+          progress.addEventListener('pointercancel', () => {
+            isSeeking = false;
+          });
+
+          const volume = root.querySelector('.mini-volume input');
+          volume.addEventListener('input', () => {
+            const video = getVideo();
+            if (!video) return;
+            video.volume = Math.min(1, Math.max(0, Number(volume.value) / 100));
+            video.muted = video.volume === 0;
           });
 
           document.body.appendChild(root);
@@ -592,6 +667,16 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
         }
 
         function getThumbnail() {
+          const mediaSessionArtwork = navigator.mediaSession?.metadata?.artwork;
+          if (mediaSessionArtwork?.length) {
+            const sorted = Array.from(mediaSessionArtwork).sort((a, b) => {
+              const aSize = Number.parseInt(a.sizes || '0', 10) || 0;
+              const bSize = Number.parseInt(b.sizes || '0', 10) || 0;
+              return bSize - aSize;
+            });
+            if (sorted[0]?.src) return sorted[0].src;
+          }
+
           const directImg = queryButton([
             'ytmusic-player-bar #song-image img',
             'ytmusic-player-bar .thumbnail-image-wrapper img',
@@ -603,9 +688,25 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           const directUrl = directImg?.currentSrc || directImg?.src || directImg?.getAttribute('src');
           if (directUrl) return directUrl;
 
-          const candidates = Array.from(document.querySelectorAll('img'))
-            .map((img) => img.currentSrc || img.src || img.getAttribute('src') || '')
-            .filter((src) => src.includes('ytimg.com') || src.includes('googleusercontent.com'));
+          const nodes = [];
+          const visit = (root) => {
+            root.querySelectorAll?.('*').forEach((node) => {
+              nodes.push(node);
+              if (node.shadowRoot) visit(node.shadowRoot);
+            });
+          };
+          visit(document);
+
+          const candidates = nodes.flatMap((node) => {
+            const urls = [];
+            if (node instanceof HTMLImageElement) {
+              urls.push(node.currentSrc, node.src, node.getAttribute('src'), node.getAttribute('data-thumb'));
+            }
+            const background = getComputedStyle(node).backgroundImage;
+            const match = background && background.match(/url\\(["']?([^"')]+)["']?\\)/);
+            if (match?.[1]) urls.push(match[1]);
+            return urls;
+          }).filter((src) => src && (src.includes('ytimg.com') || src.includes('googleusercontent.com')));
 
           return candidates[0] || '';
         }
@@ -626,7 +727,8 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
             thumbnail: getThumbnail(),
             isPlaying: video ? !video.paused && !video.ended : false,
             duration: video?.duration && Number.isFinite(video.duration) ? video.duration : 0,
-            position: video?.currentTime && Number.isFinite(video.currentTime) ? video.currentTime : 0
+            position: video?.currentTime && Number.isFinite(video.currentTime) ? video.currentTime : 0,
+            volume: video ? video.volume : 1
           };
         }
 
@@ -695,6 +797,11 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
           const playButton = root.querySelector('[data-action="playPause"]');
           playButton.innerHTML = state.isPlaying ? icons.pause : icons.play;
+
+          const volume = root.querySelector('.mini-volume input');
+          if (document.activeElement !== volume) {
+            volume.value = String(Math.round(state.volume * 100));
+          }
         }
 
         ensureMiniPlayer();
