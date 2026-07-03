@@ -175,7 +175,6 @@ const MINI_PLAYER_CSS = `
       radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.07), transparent 28%),
       linear-gradient(180deg, #202020 0%, #111 58%, #0c0c0c 100%) !important;
     z-index: 9999 !important;
-    -webkit-app-region: no-drag !important;
   }
 
   #ytm-electron-mini-player * {
@@ -488,7 +487,8 @@ const MINI_PLAYER_CSS = `
     top: 0;
     left: 0;
     right: 0;
-    z-index: 10000;
+    pointer-events: auto;
+    z-index: 2147483647;
   }
 `
 
