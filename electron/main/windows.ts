@@ -41,7 +41,7 @@ const MAIN_WINDOW_DRAG_CSS = `
   }
 
   ytmusic-nav-bar {
-    padding-left: 218px !important;
+    padding-left: 252px !important;
     box-sizing: border-box !important;
   }
 
@@ -108,7 +108,7 @@ const MAIN_WINDOW_DRAG_CSS = `
   #ytm-electron-drag-top {
     position: fixed !important;
     top: 0 !important;
-    left: 202px !important;
+    left: 236px !important;
     right: 0 !important;
     height: 14px !important;
     -webkit-app-region: drag !important;
@@ -805,6 +805,9 @@ function setupNavigationControls(win: BrowserWindow): void {
         case 'reload':
           sourceWindow.webContents.reload()
           break
+        case 'toggleMini':
+          toggleMiniPlayer()
+          break
       }
 
       sendNavigationState(sourceWindow)
@@ -846,7 +849,8 @@ async function injectMainWindowDragRegion(win: BrowserWindow): Promise<void> {
         const icons = {
           back: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
           forward: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
-          reload: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/></svg>'
+          reload: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/></svg>',
+          toggleMini: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M9 10v4l4-2-4-2Z" fill="currentColor" stroke="none"/><path d="M15 15h2"/></svg>'
         };
 
         const ensureToolbar = () => {
@@ -859,7 +863,8 @@ async function injectMainWindowDragRegion(win: BrowserWindow): Promise<void> {
           toolbar.innerHTML = [
             ['back', '后退'],
             ['forward', '前进'],
-            ['reload', '刷新']
+            ['reload', '刷新'],
+            ['toggleMini', '切换迷你播放器']
           ].map(([command, label]) => (
             '<button type="button" data-command="' + command + '" aria-label="' + label + '" title="' + label + '">' +
               icons[command] +
@@ -1001,7 +1006,9 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
           });
 
           root.querySelector('.mini-theme').addEventListener('click', () => {
-            if (isThemeButtonHidden()) return;
+            if (isThemeButtonHidden()) {
+              setThemeButtonHidden(false);
+            }
             const current = getCurrentThemeId();
             const index = themes.findIndex((theme) => theme.id === current);
             const next = themes[(index + 1) % themes.length].id;
@@ -1086,6 +1093,10 @@ async function injectMiniPlayerStyles(win: BrowserWindow): Promise<void> {
 
         function toggleThemeButtonHidden() {
           const hidden = !isThemeButtonHidden();
+          setThemeButtonHidden(hidden);
+        }
+
+        function setThemeButtonHidden(hidden) {
           try {
             localStorage.setItem(THEME_BUTTON_HIDDEN_KEY, hidden ? '1' : '0');
           } catch {}

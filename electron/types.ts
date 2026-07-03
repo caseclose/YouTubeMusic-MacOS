@@ -1,5 +1,5 @@
 export type PlayerControlAction = 'playPause' | 'next' | 'previous' | 'seek' | 'setVolume' | 'like' | 'dislike'
-export type NavigationCommand = 'back' | 'forward' | 'reload'
+export type NavigationCommand = 'back' | 'forward' | 'reload' | 'toggleMini'
 
 export interface NavigationState {
   canGoBack: boolean
